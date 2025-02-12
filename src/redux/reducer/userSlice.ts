@@ -16,9 +16,12 @@ export const userSlice = createSlice({
     increment: (state) => {
       state.email = "";
     },
+    incrementByAmount: (state, action: PayloadAction<string>) => {
+      state.email = action.payload;
+    },
   },
 });
 
-export const { increment } = userSlice.actions;
+export const { increment, incrementByAmount } = userSlice.actions;
 export const user = (state: RootState) => state.user.email;
 export default userSlice.reducer;
