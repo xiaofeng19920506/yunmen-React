@@ -1,22 +1,42 @@
 import { Button } from "@mui/material";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { signup } from "./utils/Request/userAuth";
 
 const SignUp: React.FC = () => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (
+      fullName === "" ||
+      email === "" ||
+      password === "" ||
+      confirmPassword === ""
+    ) {
+      alert("Please fill out all the fields");
+      return;
+    }
     if (password !== confirmPassword) {
       alert("Passwords do not match.");
       return;
     }
-    console.log("Full Name:", fullName);
-    console.log("Email:", email);
-    console.log("Password:", password);
+
+    const signupUser = async () => {
+      try {
+        await signup({ fullName, email, password });
+        navigate("/login");
+      } catch (error) {
+        console.error("Error creating event:", error);
+        throw error;
+      }
+    };
+
+    signupUser();
   };
 
   return (

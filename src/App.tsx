@@ -7,6 +7,8 @@ import { useEffect } from "react";
 import { stringAvatar } from "./utils/userUtil";
 import { updateModalState } from "./redux/reducer/eventModal/eventModalSlice";
 import EventModal from "./component/EventModal";
+import { getEvents } from "./utils/Request/userEvent";
+import { updateEvent } from "./redux/reducer/user/userSlice";
 
 const App = () => {
   const navigate = useNavigate();
@@ -27,9 +29,12 @@ const App = () => {
   };
 
   useEffect(() => {
-    //fetching user information and grab the avatar uri
+    const fetchEvents = async () => {
+      const events = await getEvents();
+      dispatch(updateEvent(events));
+    };
     if (token) {
-      
+      fetchEvents();
     }
   }, [token]);
 
@@ -52,9 +57,7 @@ const App = () => {
           </>
         )}
       </div>
-      <div>
-
-      </div>
+      <div></div>
       <EventModal
         onOpen={open}
         onClose={() => dispatch(updateModalState(false))}

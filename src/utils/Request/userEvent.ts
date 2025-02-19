@@ -1,6 +1,5 @@
 import axiosInstance from "./axios";
 
-// Create an event
 export const createEvent = async (eventData: any) => {
   try {
     const response = await axiosInstance.post("/events", eventData);
@@ -11,7 +10,6 @@ export const createEvent = async (eventData: any) => {
   }
 };
 
-// Retrieve all events
 export const getEvents = async () => {
   try {
     const response = await axiosInstance.get("/events");
@@ -22,7 +20,6 @@ export const getEvents = async () => {
   }
 };
 
-// Delete a single event by id
 export const deleteEvent = async (id: string) => {
   try {
     const response = await axiosInstance.delete(`/events/${id}`);
@@ -33,8 +30,6 @@ export const deleteEvent = async (id: string) => {
   }
 };
 
-// Update a single event by id
-// Note: Ensure the `Event` type/interface is defined elsewhere in your codebase
 export const updateEvent = async (id: string, event: Event) => {
   try {
     const response = await axiosInstance.put(`/events/${id}`, event);

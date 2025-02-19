@@ -15,7 +15,7 @@ export type Event = {
 const initialState: userState = {
   email: "",
   name: "",
-  token: "1",
+  token: "",
   event: [],
 };
 
@@ -24,11 +24,7 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     updateUser: (state, action: PayloadAction<userState>) => {
-      const keepedToken = state.token;
-      state = {
-        ...action.payload,
-        token: keepedToken,
-      };
+      return action.payload;
     },
     updateEvent: (state, action: PayloadAction<Event[]>) => {
       state.event = action.payload;
