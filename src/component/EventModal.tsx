@@ -21,7 +21,7 @@ type EventModalProp = {
 
 const EventModal: React.FC<EventModalProp> = ({ onOpen, onClose }) => {
   const [title, setTitle] = useState<string>("");
-  const [events, setEvents] = useState<Event[]>([]);
+  const [events, setEvents] = useState<Event[]>([{ event: "" }]);
   const dispatch = useAppDispatch();
 
   const handleCreateEvent = () => {
