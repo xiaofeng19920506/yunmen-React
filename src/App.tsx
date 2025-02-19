@@ -12,9 +12,8 @@ const App = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { token, name } = useAppSelector((state: RootState) => state.user);
-  const { open } = useAppSelector((state: RootState) => state.eventModal);
+  const { open } = useAppSelector((state: RootState) => state.modal);
 
-  console.log({ open });
   const handleSignInClick = () => {
     navigate("/signin");
   };
@@ -29,7 +28,10 @@ const App = () => {
 
   useEffect(() => {
     //fetching user information and grab the avatar uri
-  }, []);
+    if (token) {
+
+    }
+  }, [token]);
 
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
@@ -51,11 +53,12 @@ const App = () => {
         )}
       </div>
       <div>
-        <EventModal
-          onOpen={open}
-          onClose={() => dispatch(updateModalState(false))}
-        />
+
       </div>
+      <EventModal
+        onOpen={open}
+        onClose={() => dispatch(updateModalState(false))}
+      />
     </div>
   );
 };

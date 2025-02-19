@@ -8,20 +8,11 @@ import {
   Stack,
   IconButton,
 } from "@mui/material";
-import {
-  DatePicker,
-  TimePicker,
-  LocalizationProvider,
-} from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { Dayjs } from "dayjs";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
-
-type Schedule = {
-  date: Dayjs | null;
-  time: Dayjs | null;
-};
+import { useAppDispatch } from "../hooks/reduxHooks";
+import { updateEvent } from "../redux/reducer/user/userSlice";
+import { Event } from "../redux/reducer/user/userSlice";
 
 type EventModalProp = {
   onOpen: boolean;
@@ -30,44 +21,34 @@ type EventModalProp = {
 
 const EventModal: React.FC<EventModalProp> = ({ onOpen, onClose }) => {
   const [title, setTitle] = useState<string>("");
-  const [schedules, setSchedules] = useState<Schedule[]>([
-    { date: null, time: null },
-  ]);
+  const [events, setEvents] = useState<Event[]>([]);
+  const dispatch = useAppDispatch();
 
   const handleCreateEvent = () => {
-    const formattedSchedules = schedules.map((schedule) => ({
-      date: schedule.date ? schedule.date.format("YYYY-MM-DD") : null,
-      time: schedule.time ? schedule.time.format("HH:mm") : null,
-    }));
     console.log("Event Created:", {
       title,
-      schedules: formattedSchedules,
+      events,
     });
     onClose();
   };
 
   const handleAddSchedule = () => {
-    setSchedules([...schedules, { date: null, time: null }]);
+    setEvents([...events, { event: "" } as Event]);
   };
 
   const handleRemoveSchedule = (index: number) => {
-    if (schedules.length > 1) {
-      setSchedules(schedules.filter((_, i) => i !== index));
+    if (events.length > 1) {
+      setEvents(events.filter((_, i) => i !== index));
     }
   };
 
-  const handleDateChange = (index: number, newDate: Dayjs | null) => {
-    const newSchedules = schedules.map((schedule, i) =>
-      i === index ? { ...schedule, date: newDate } : schedule
+  const handleEventChange = (index: number, newEvent: string) => {
+    const newEvents: Event[] = events.map((item, i) =>
+      i === index ? { ...item, event: newEvent } : item
     );
-    setSchedules(newSchedules);
-  };
 
-  const handleTimeChange = (index: number, newTime: Dayjs | null) => {
-    const newSchedules = schedules.map((schedule, i) =>
-      i === index ? { ...schedule, time: newTime } : schedule
-    );
-    setSchedules(newSchedules);
+    dispatch(updateEvent(newEvents));
+    setEvents(newEvents);
   };
 
   return (
@@ -98,45 +79,33 @@ const EventModal: React.FC<EventModalProp> = ({ onOpen, onClose }) => {
           sx={{ mb: 2 }}
         />
 
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <Stack spacing={2}>
-            {schedules.map((schedule, index) => (
-              <Stack
-                key={index}
-                direction="row"
-                spacing={2}
-                alignItems="center"
-              >
-                <DatePicker
-                  label="Event Date"
-                  value={schedule.date}
-                  onChange={(newValue) => handleDateChange(index, newValue)}
-                  slotProps={{ textField: { fullWidth: true } }}
-                />
-                <TimePicker
-                  label="Start Time"
-                  value={schedule.time}
-                  onChange={(newValue) => handleTimeChange(index, newValue)}
-                  slotProps={{ textField: { fullWidth: true } }}
-                />
-                {schedules.length > 1 && (
-                  <IconButton
-                    onClick={() => handleRemoveSchedule(index)}
-                    color="error"
-                  >
-                    <RemoveCircleOutlineIcon />
-                  </IconButton>
-                )}
-              </Stack>
-            ))}
-            <Button
-              startIcon={<AddCircleOutlineIcon />}
-              onClick={handleAddSchedule}
-            >
-              Add Date &amp; Time
-            </Button>
-          </Stack>
-        </LocalizationProvider>
+        <Stack spacing={2}>
+          {events.map((item, index) => (
+            <Stack key={index} direction="row" spacing={2} alignItems="center">
+              <TextField
+                label="Event"
+                type="text"
+                value={item.event} // Access the event string directly
+                onChange={(e) => handleEventChange(index, e.target.value)}
+                fullWidth
+              />
+              {events.length > 1 && (
+                <IconButton
+                  onClick={() => handleRemoveSchedule(index)}
+                  color="error"
+                >
+                  <RemoveCircleOutlineIcon />
+                </IconButton>
+              )}
+            </Stack>
+          ))}
+          <Button
+            startIcon={<AddCircleOutlineIcon />}
+            onClick={handleAddSchedule}
+          >
+            Add Event
+          </Button>
+        </Stack>
 
         <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
           <Button

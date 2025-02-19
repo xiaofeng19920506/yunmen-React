@@ -11,7 +11,7 @@ const initialState: modalState = {
 };
 
 export const modalSlice = createSlice({
-  name: "eventModal",
+  name: "modal",
   initialState,
   reducers: {
     updateModalState: (state, action: PayloadAction<boolean>) => {
@@ -21,5 +21,5 @@ export const modalSlice = createSlice({
 });
 
 export const { updateModalState } = modalSlice.actions;
-export const modalState = (state: RootState) => state.eventModal.open;
+export const modalState = (state: RootState) => state.modal.open;
 export default modalSlice.reducer;
