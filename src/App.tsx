@@ -29,7 +29,7 @@ const App = () => {
   useEffect(() => {
     //fetching user information and grab the avatar uri
     if (token) {
-
+      
     }
   }, [token]);
 
