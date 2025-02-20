@@ -1,7 +1,5 @@
-import { useAppDispatch } from "../../hooks/reduxHooks";
-import { updateUser } from "../../redux/reducer/user/userSlice";
 import axiosInstance from "./axios";
-import Cookie from "js-cookie";
+import Cookies from "js-cookie";
 
 type User = {
   email: string;
@@ -9,17 +7,13 @@ type User = {
   password: string;
 };
 
-const dispatch = useAppDispatch();
-
 export const login = async (email: string, password: string) => {
   try {
     const response = await axiosInstance.post("/auth/login", {
       email,
       password,
     });
-    const { user, token } = response.data;
-    dispatch(updateUser({ ...user }));
-    Cookie.set("jwt", token, { expires: 1 });
+    return response.data;
   } catch (error) {
     console.error("Error creating event:", error);
     throw error;
@@ -28,16 +22,9 @@ export const login = async (email: string, password: string) => {
 
 export const logout = async () => {
   try {
-    await axiosInstance.post("/auth/logout");
-    dispatch(
-      updateUser({
-        email: "",
-        name: "",
-        event: [],
-        id: "",
-      })
-    );
-    Cookie.remove("jwt");
+    const response = await axiosInstance.post("/auth/logout");
+    Cookies.remove("jwt");
+    return response.data;
   } catch (error) {
     console.error("Error creating event:", error);
     throw error;

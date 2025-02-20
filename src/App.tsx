@@ -44,7 +44,7 @@ const App = () => {
         <Button variant="contained" onClick={handleSignUpClick}>
           Sign Up
         </Button>
-        {id === "" ? (
+        {id === "" || id === undefined ? (
           <Button variant={"contained"} onClick={handleSignInClick}>
             Sign In
           </Button>
