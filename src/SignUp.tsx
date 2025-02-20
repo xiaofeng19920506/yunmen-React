@@ -29,7 +29,7 @@ const SignUp: React.FC = () => {
     const signupUser = async () => {
       try {
         await signup({ fullName, email, password });
-        navigate("/login");
+        navigate("/signin");
       } catch (error) {
         console.error("Error creating event:", error);
         throw error;
