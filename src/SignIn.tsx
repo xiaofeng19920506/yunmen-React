@@ -2,20 +2,16 @@ import { Button } from "@mui/material";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "./utils/Request/userAuth";
-import { useAppDispatch } from "./hooks/reduxHooks";
-import { updateUser } from "./redux/reducer/user/userSlice";
 
 const SignIn: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const dispath = useAppDispatch();
   const navigate = useNavigate();
 
   const loginUser = async (email: string, password: string) => {
     try {
-      const { token } = await login(email, password);
-      dispath(updateUser({ email, name: "", token, event: [] }));
+      await login(email, password);
+
       navigate("/");
     } catch (error) {
       console.error("login failed: ", error);

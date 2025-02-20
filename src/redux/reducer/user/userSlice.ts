@@ -5,8 +5,8 @@ import type { RootState } from "../../store/store";
 interface userState {
   email: string;
   name: string;
-  token: string;
   event: Event[];
+  id: string;
 }
 
 export type Event = {
@@ -15,8 +15,8 @@ export type Event = {
 const initialState: userState = {
   email: "",
   name: "",
-  token: "",
   event: [],
+  id: "",
 };
 
 export const userSlice = createSlice({
@@ -29,8 +29,8 @@ export const userSlice = createSlice({
     updateEvent: (state, action: PayloadAction<Event[]>) => {
       state.event = action.payload;
     },
-    logoutUser: (state) => {
-      state.token = "";
+    logoutUser: (_state) => {
+      return initialState;
     },
   },
 });

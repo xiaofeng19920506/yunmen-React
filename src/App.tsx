@@ -13,7 +13,7 @@ import { updateEvent } from "./redux/reducer/user/userSlice";
 const App = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { token, name } = useAppSelector((state: RootState) => state.user);
+  const { name, id } = useAppSelector((state: RootState) => state.user);
   const { open } = useAppSelector((state: RootState) => state.modal);
 
   const handleSignInClick = () => {
@@ -33,10 +33,10 @@ const App = () => {
       const events = await getEvents();
       dispatch(updateEvent(events));
     };
-    if (token) {
+    if (id) {
       fetchEvents();
     }
-  }, [token]);
+  }, [id]);
 
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
@@ -44,7 +44,7 @@ const App = () => {
         <Button variant="contained" onClick={handleSignUpClick}>
           Sign Up
         </Button>
-        {token === "" ? (
+        {id === "" ? (
           <Button variant={"contained"} onClick={handleSignInClick}>
             Sign In
           </Button>
@@ -53,7 +53,7 @@ const App = () => {
             <Button variant="contained" onClick={openEventModal}>
               Add Event
             </Button>
-            <Avatar {...stringAvatar(name ? name : "Anonomous User")}></Avatar>
+            <Avatar {...stringAvatar(name)}></Avatar>
           </>
         )}
       </div>
