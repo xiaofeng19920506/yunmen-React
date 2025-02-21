@@ -13,7 +13,6 @@ const SignIn: React.FC = () => {
   const loginUser = async (email: string, password: string) => {
     try {
       const { user, token } = await login(email, password);
-      console.log(user, token);
       dispatch(updateUser(user));
       Cookie.set("jwt", token, { expires: 1 });
       navigate("/");

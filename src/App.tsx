@@ -13,7 +13,7 @@ import { updateEvent } from "./redux/reducer/user/userSlice";
 const App = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { name, id } = useAppSelector((state: RootState) => state.user);
+  const { name, id, event } = useAppSelector((state: RootState) => state.user);
   const { open } = useAppSelector((state: RootState) => state.modal);
 
   const handleSignInClick = () => {
@@ -39,8 +39,23 @@ const App = () => {
   }, [id]);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column" }}>
-      <div style={{ display: "flex", justifyContent: "flex-end", gap: "2%" }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        width: "100%",
+        minHeight: "100vh",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: "2%",
+          padding: "10px",
+        }}
+      >
         <Button variant="contained" onClick={handleSignUpClick}>
           Sign Up
         </Button>
@@ -57,7 +72,22 @@ const App = () => {
           </>
         )}
       </div>
-      <div></div>
+      <div
+        style={{
+          display: "flex",
+          flex: "1",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {event.length > 0 ? (
+          <div></div>
+        ) : id !== "" ? (
+          <span>There is no event going on</span>
+        ) : (
+          <span>Please Sign in to see your events</span>
+        )}
+      </div>
       <EventModal
         onOpen={open}
         onClose={() => dispatch(updateModalState(false))}

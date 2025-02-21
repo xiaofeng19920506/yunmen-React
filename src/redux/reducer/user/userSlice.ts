@@ -10,8 +10,10 @@ interface userState {
 }
 
 export type Event = {
-  event: string;
+  eventTitle: string;
+  eventContent: string[];
 };
+
 const initialState: userState = {
   email: "",
   name: "",

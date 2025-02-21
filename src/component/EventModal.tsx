@@ -10,9 +10,10 @@ import {
 } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
-import { useAppDispatch } from "../hooks/reduxHooks";
+import { useAppDispatch, useAppSelector } from "../hooks/reduxHooks";
 import { updateEvent } from "../redux/reducer/user/userSlice";
 import { Event } from "../redux/reducer/user/userSlice";
+import { RootState } from "../redux/store/store";
 
 type EventModalProp = {
   onOpen: boolean;
@@ -21,19 +22,21 @@ type EventModalProp = {
 
 const EventModal: React.FC<EventModalProp> = ({ onOpen, onClose }) => {
   const [title, setTitle] = useState<string>("");
-  const [events, setEvents] = useState<Event[]>([{ event: "" }]);
+  const [events, setEvents] = useState<string[]>([""]);
   const dispatch = useAppDispatch();
+  const { event } = useAppSelector((state: RootState) => state.user);
 
   const handleCreateEvent = () => {
-    console.log("Event Created:", {
-      title,
-      events,
-    });
+    const newEvent: Event = {
+      eventTitle: title,
+      eventContent: events,
+    };
+    dispatch(updateEvent([newEvent, ...event]));
     onClose();
   };
 
   const handleAddSchedule = () => {
-    setEvents([...events, { event: "" } as Event]);
+    setEvents([...events, ""]);
   };
 
   const handleRemoveSchedule = (index: number) => {
@@ -42,12 +45,10 @@ const EventModal: React.FC<EventModalProp> = ({ onOpen, onClose }) => {
     }
   };
 
-  const handleEventChange = (index: number, newEvent: string) => {
-    const newEvents: Event[] = events.map((item, i) =>
-      i === index ? { ...item, event: newEvent } : item
+  const handleEventChange = (index: number, newEventText: string) => {
+    const newEvents = events.map((item, i) =>
+      i === index ? newEventText : item
     );
-
-    dispatch(updateEvent(newEvents));
     setEvents(newEvents);
   };
 
@@ -85,7 +86,7 @@ const EventModal: React.FC<EventModalProp> = ({ onOpen, onClose }) => {
               <TextField
                 label="Event"
                 type="text"
-                value={item.event} // Access the event string directly
+                value={item} // Use the event string directly
                 onChange={(e) => handleEventChange(index, e.target.value)}
                 fullWidth
               />
