@@ -8,7 +8,7 @@ import { stringAvatar } from "./utils/userUtil";
 import { updateModalState } from "./redux/reducer/eventModal/eventModalSlice";
 import EventModal from "./component/EventModal";
 import { getEvents } from "./utils/Request/userEvent";
-import { updateEvent } from "./redux/reducer/user/userSlice";
+import { addEvent } from "./redux/reducer/user/userSlice";
 
 const App = () => {
   const navigate = useNavigate();
@@ -31,7 +31,8 @@ const App = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       const events = await getEvents();
-      dispatch(updateEvent(events));
+      console.log(events);
+      dispatch(addEvent(events));
     };
     if (id) {
       fetchEvents();
@@ -56,13 +57,15 @@ const App = () => {
           padding: "10px",
         }}
       >
-        <Button variant="contained" onClick={handleSignUpClick}>
-          Sign Up
-        </Button>
         {id === "" || id === undefined ? (
-          <Button variant={"contained"} onClick={handleSignInClick}>
-            Sign In
-          </Button>
+          <>
+            <Button variant="contained" onClick={handleSignUpClick}>
+              Sign Up
+            </Button>
+            <Button variant={"contained"} onClick={handleSignInClick}>
+              Sign In
+            </Button>
+          </>
         ) : (
           <>
             <Button variant="contained" onClick={openEventModal}>
