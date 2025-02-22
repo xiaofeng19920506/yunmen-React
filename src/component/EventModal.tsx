@@ -12,8 +12,6 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import { useAppDispatch } from "../hooks/reduxHooks";
 import { addEvent } from "../redux/reducer/user/userSlice";
-import { Event } from "../redux/reducer/user/userSlice";
-
 import { createEvent } from "../utils/Request/userEvent";
 
 type EventModalProp = {
