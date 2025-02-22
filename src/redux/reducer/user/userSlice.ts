@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../../store/store";
-import { updateEvent } from "../../../utils/Request/userEvent";
 
 interface userState {
   email: string;
@@ -36,8 +35,10 @@ export const userSlice = createSlice({
     addEvent: (state, action: PayloadAction<Event>) => {
       state.event = [...state.event, action.payload];
     },
-    updateEvent: (state, action: PayloadAction<string>) => {
-      console.log(state, action);
+    updateEvent: (state, action: PayloadAction<Event>) => {
+      state.event = state.event.map((event) =>
+        event._id === action.payload._id ? action.payload : event
+      );
     },
     logoutUser: (_state) => {
       return initialState;
@@ -45,7 +46,7 @@ export const userSlice = createSlice({
   },
 });
 
-export const { updateUser, logoutUser, addEvent, getAllEvents } =
+export const { updateUser, logoutUser, addEvent, getAllEvents, updateEvent } =
   userSlice.actions;
 export const user = (state: RootState) => state.user.email;
 export default userSlice.reducer;
