@@ -27,12 +27,15 @@ const EventModal: React.FC<EventModalProp> = ({ onOpen, onClose }) => {
   const dispatch = useAppDispatch();
 
   const handleCreateEvent = async () => {
-    const newEvent: Event = {
+    const allEvents = await createEvent({
       eventTitle: title,
       eventContent: events,
-    };
-    const allEvents = await createEvent(newEvent);
-    dispatch(addEvent(allEvents));
+    });
+    const eventLength = allEvents.data.holdEvents.length;
+    const eventId = allEvents.data.holdEvents[eventLength - 1];
+    dispatch(
+      addEvent({ _id: eventId, eventTitle: title, eventContent: events })
+    );
     onClose();
   };
 

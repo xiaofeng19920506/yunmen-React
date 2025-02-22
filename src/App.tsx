@@ -8,7 +8,7 @@ import { stringAvatar } from "./utils/userUtil";
 import { updateModalState } from "./redux/reducer/eventModal/eventModalSlice";
 import EventModal from "./component/EventModal";
 import { getEvents } from "./utils/Request/userEvent";
-import { addEvent } from "./redux/reducer/user/userSlice";
+import { getAllEvents } from "./redux/reducer/user/userSlice";
 
 const App = () => {
   const navigate = useNavigate();
@@ -32,7 +32,7 @@ const App = () => {
     const fetchEvents = async () => {
       const events = await getEvents();
       console.log(events);
-      dispatch(addEvent(events));
+      dispatch(getAllEvents(events));
     };
     if (id) {
       fetchEvents();

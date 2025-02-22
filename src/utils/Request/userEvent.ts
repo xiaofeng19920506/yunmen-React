@@ -13,7 +13,7 @@ export const createEvent = async (eventData: any) => {
 export const getEvents = async () => {
   try {
     const response = await axiosInstance.get("/events");
-    return response.data;
+    return response.data.data;
   } catch (error) {
     console.error("Error getting events:", error);
     throw error;
