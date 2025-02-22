@@ -31,7 +31,6 @@ const App = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       const events = await getEvents();
-      console.log(events);
       dispatch(getAllEvents(events));
     };
     if (id) {
