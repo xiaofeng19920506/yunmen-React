@@ -1,14 +1,15 @@
-import { Avatar } from "@mui/material";
+import { Avatar, Grid, Container } from "@mui/material";
+import Button from "@mui/material/Button";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "./hooks/reduxHooks";
 import { RootState } from "./redux/store/store";
-import Button from "@mui/material/Button";
-import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 import { stringAvatar } from "./utils/userUtil";
 import { updateModalState } from "./redux/reducer/eventModal/eventModalSlice";
 import EventModal from "./component/EventModal";
 import { getEvents } from "./utils/Request/userEvent";
 import { getAllEvents } from "./redux/reducer/user/userSlice";
+import DashboardCard from "./component/DashboardCard";
 
 const App = () => {
   const navigate = useNavigate();
@@ -16,15 +17,15 @@ const App = () => {
   const { name, id, event } = useAppSelector((state: RootState) => state.user);
   const { open } = useAppSelector((state: RootState) => state.modal);
 
-  const handleSignInClick = () => {
+  const handleSignInClick = (): void => {
     navigate("/signin");
   };
 
-  const handleSignUpClick = () => {
+  const handleSignUpClick = (): void => {
     navigate("/signup");
   };
 
-  const openEventModal = () => {
+  const openEventModal = (): void => {
     dispatch(updateModalState(true));
   };
 
@@ -36,24 +37,24 @@ const App = () => {
     if (id) {
       fetchEvents();
     }
-  }, [id]);
+  }, [id, dispatch]);
 
   return (
-    <div
-      style={{
+    <Container
+      sx={{
         display: "flex",
         flexDirection: "column",
-        height: "100%",
-        width: "100%",
         minHeight: "100vh",
+        padding: "20px",
       }}
     >
+      {/* Header with sign in/up or event actions */}
       <div
         style={{
           display: "flex",
           justifyContent: "flex-end",
-          gap: "2%",
-          padding: "10px",
+          gap: "1rem",
+          marginBottom: "20px",
         }}
       >
         {id === "" || id === undefined ? (
@@ -61,7 +62,7 @@ const App = () => {
             <Button variant="contained" onClick={handleSignUpClick}>
               Sign Up
             </Button>
-            <Button variant={"contained"} onClick={handleSignInClick}>
+            <Button variant="contained" onClick={handleSignInClick}>
               Sign In
             </Button>
           </>
@@ -70,31 +71,46 @@ const App = () => {
             <Button variant="contained" onClick={openEventModal}>
               Add Event
             </Button>
-            <Avatar {...stringAvatar(name)}></Avatar>
+            <Avatar {...stringAvatar(name)} />
           </>
         )}
       </div>
-      <div
-        style={{
-          display: "flex",
-          flex: "1",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        {event.length > 0 ? (
-          <div></div>
-        ) : id !== "" ? (
-          <span>There is no event going on</span>
-        ) : (
-          <span>Please Sign in to see your events</span>
-        )}
-      </div>
+
+      {event?.length >= 1 ? (
+        <Grid container spacing={3} justifyContent="center">
+          {event.map(({ _id, eventTitle, eventContent }, index) => (
+            <Grid
+              item
+              key={_id || `event-${index}`}
+              xs={12}
+              sm={6}
+              md={4}
+              lg={3}
+            >
+              <DashboardCard
+                id={_id}
+                title={eventTitle}
+                content={eventContent}
+              />
+            </Grid>
+          ))}
+        </Grid>
+      ) : id !== "" ? (
+        <span style={{ textAlign: "center", marginTop: "20px" }}>
+          There is no event going on
+        </span>
+      ) : (
+        <span style={{ textAlign: "center", marginTop: "20px" }}>
+          Please Sign in to see your events
+        </span>
+      )}
+
+      {/* Event modal */}
       <EventModal
         onOpen={open}
         onClose={() => dispatch(updateModalState(false))}
       />
-    </div>
+    </Container>
   );
 };
 
