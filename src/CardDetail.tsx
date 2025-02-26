@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
   Button,
   Container,
@@ -13,8 +13,9 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { getOneEvent } from "./utils/Request/userEvent";
-import { useAppSelector } from "./hooks/reduxHooks";
+import { useAppDispatch, useAppSelector } from "./hooks/reduxHooks";
 import { RootState } from "./redux/store/store";
+import { updateLocation } from "./redux/reducer/user/userSlice";
 
 const CardDetail: React.FC = () => {
   const { id } = useParams();
@@ -26,9 +27,9 @@ const CardDetail: React.FC = () => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingContent, setEditingContent] = useState<string>("");
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
-
+  const dispatch = useAppDispatch();
   const userId = useAppSelector((state: RootState) => state.user.id);
-
+  const location = useLocation();
   useEffect(() => {
     const fetchEvent = async (id: string) => {
       const { event } = await getOneEvent(id);
@@ -39,6 +40,7 @@ const CardDetail: React.FC = () => {
     if (id && userId !== "") {
       fetchEvent(id);
     } else {
+      dispatch(updateLocation(location.pathname));
       navigate("/signin");
     }
   }, [id, userId]);

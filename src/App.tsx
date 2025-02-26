@@ -8,7 +8,7 @@ import { stringAvatar } from "./utils/userUtil";
 import { updateModalState } from "./redux/reducer/eventModal/eventModalSlice";
 import EventModal from "./component/EventModal";
 import { getEvents } from "./utils/Request/userEvent";
-import { getAllEvents } from "./redux/reducer/user/userSlice";
+import { getAllEvents, logoutUser } from "./redux/reducer/user/userSlice";
 import DashboardCard from "./component/DashboardCard";
 
 const App = () => {
@@ -27,6 +27,10 @@ const App = () => {
 
   const openEventModal = (): void => {
     dispatch(updateModalState(true));
+  };
+
+  const handleLogOutClick = (): void => {
+    dispatch(logoutUser());
   };
 
   useEffect(() => {
@@ -68,6 +72,9 @@ const App = () => {
           </>
         ) : (
           <>
+            <Button variant="contained" onClick={handleLogOutClick}>
+              Log Out
+            </Button>
             <Button variant="contained" onClick={openEventModal}>
               Add Event
             </Button>

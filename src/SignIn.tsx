@@ -2,20 +2,22 @@ import { Button } from "@mui/material";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "./utils/Request/userAuth";
-import { useAppDispatch } from "./hooks/reduxHooks";
+import { useAppDispatch, useAppSelector } from "./hooks/reduxHooks";
 import { updateUser } from "./redux/reducer/user/userSlice";
 import Cookie from "js-cookie";
+import { RootState } from "./redux/store/store";
 const SignIn: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const { location } = useAppSelector((state: RootState) => state.user);
   const loginUser = async (email: string, password: string) => {
     try {
       const { user, token } = await login(email, password);
       dispatch(updateUser(user));
       Cookie.set("jwt", token, { expires: 1 });
-      navigate("/");
+      navigate(location);
     } catch (error) {
       console.error("login failed: ", error);
       throw error;

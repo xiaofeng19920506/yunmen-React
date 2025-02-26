@@ -7,6 +7,7 @@ interface userState {
   name: string;
   event: Event[];
   id: string;
+  location: string;
 }
 
 export type Event = {
@@ -20,6 +21,7 @@ const initialState: userState = {
   name: "",
   event: [],
   id: "",
+  location: "/",
 };
 
 export const userSlice = createSlice({
@@ -40,13 +42,22 @@ export const userSlice = createSlice({
         event._id === action.payload._id ? action.payload : event
       );
     },
-    logoutUser: (_state) => {
-      return initialState;
+    updateLocation: (state, action: PayloadAction<string>) => {
+      state.location = action.payload;
+    },
+    logoutUser: (state) => {
+      return { ...initialState, location: state.location };
     },
   },
 });
 
-export const { updateUser, logoutUser, addEvent, getAllEvents, updateEvent } =
-  userSlice.actions;
+export const {
+  updateUser,
+  logoutUser,
+  addEvent,
+  getAllEvents,
+  updateEvent,
+  updateLocation,
+} = userSlice.actions;
 export const user = (state: RootState) => state.user.email;
 export default userSlice.reducer;
