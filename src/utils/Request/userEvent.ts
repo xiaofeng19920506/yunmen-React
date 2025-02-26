@@ -43,7 +43,7 @@ export const updateEvent = async (id: string, event: Event) => {
 export const getOneEvent = async (id: string) => {
   try {
     const response = await axiosInstance.get(`/events/${id}`);
-    return response.data;
+    return response.data.data;
   } catch (error) {
     console.error("Error getting one event", event);
     throw error;

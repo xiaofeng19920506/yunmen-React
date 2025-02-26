@@ -1,147 +1,138 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
   Button,
   Container,
   Typography,
   Box,
   Paper,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   TextField,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { getOneEvent } from "./utils/Request/userEvent";
+import { useAppSelector } from "./hooks/reduxHooks";
+import { RootState } from "./redux/store/store";
 
 const CardDetail: React.FC = () => {
-  const navigate = useNavigate();
   const { id } = useParams();
-  const [openDialog, setOpenDialog] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [title, setTitle] = useState("Sample Card Title");
-  const [content, setContent] = useState(
-    "This is a sample content for the card. It can be longer if needed."
-  );
+
+  const [title, setTitle] = useState<string>("");
+  const [content, setContent] = useState<string[]>([]);
+  const [isOwner, setIsOwner] = useState<boolean>(false);
+
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editingContent, setEditingContent] = useState<string>("");
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+
+  const userId = useAppSelector((state: RootState) => state.user.id);
+
   useEffect(() => {
     const fetchEvent = async (id: string) => {
-      const event = await getOneEvent(id);
-      console.log({ event });
+      const { event } = await getOneEvent(id);
+      setTitle(event.eventTitle);
+      setContent(event.eventContent);
+      setIsOwner(userId === event.owner);
     };
     if (id) {
       fetchEvent(id);
     }
-  }, [id]);
+  }, [id, userId]);
 
-  const handleUpdate = async () => {
-    console.log("Update card:", id);
-    // Handle saving the changes (e.g., API call to update the card in the database)
-    setIsEditing(false); // Exit edit mode
+  const handleAccordionChange = (index: number) => {
+    setExpandedIndex(expandedIndex === index ? null : index);
   };
 
-  const handleDeleteClick = () => {
-    setOpenDialog(true); // Open confirmation dialog
+  const handleUpdateContent = async (index: number) => {
+    const updatedContent = [...content];
+    updatedContent[index] = editingContent;
+    setContent(updatedContent);
+    setEditingIndex(null);
   };
 
-  const handleConfirmDelete = async () => {
-    console.log("Deleting card:", id);
-    setOpenDialog(false);
-    navigate("/"); // Redirect to home or another page after deletion
-  };
-
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
+  const handleDeleteContent = async (index: number) => {
+    const updatedContent = content.filter((_, i) => i !== index);
+    setContent(updatedContent);
+    if (expandedIndex === index) {
+      setExpandedIndex(null);
+    } else if (expandedIndex && expandedIndex > index) {
+      setExpandedIndex(expandedIndex - 1);
+    }
   };
 
   return (
     <Container maxWidth="md" sx={{ marginTop: 4 }}>
-      <Box display="flex" justifyContent="space-between" marginBottom={2}>
-        {!isEditing ? (
-          <>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => setIsEditing(true)}
-            >
-              Edit Card
-            </Button>
-            <Button
-              variant="contained"
-              color="error"
-              onClick={handleDeleteClick}
-            >
-              Delete Card
-            </Button>
-          </>
-        ) : (
-          <>
-            <Button variant="contained" color="primary" onClick={handleUpdate}>
-              Save Changes
-            </Button>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={() => setIsEditing(false)}
-            >
-              Cancel
-            </Button>
-          </>
-        )}
-      </Box>
-
-      {/* Card Title & Content */}
       <Paper elevation={3} sx={{ padding: 3 }}>
-        {!isEditing ? (
-          <>
-            <Typography variant="h4" gutterBottom>
-              {title}
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              {content}
-            </Typography>
-          </>
-        ) : (
-          <>
-            <TextField
-              fullWidth
-              label="Card Title"
-              variant="outlined"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              sx={{ marginBottom: 2 }}
-            />
-            <TextField
-              fullWidth
-              label="Card Content"
-              variant="outlined"
-              multiline
-              rows={4}
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-            />
-          </>
-        )}
-      </Paper>
-
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle>Confirm Deletion</DialogTitle>
-        <DialogContent>
-          <Typography>Are you sure you want to delete this card?</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog} color="primary">
-            Cancel
-          </Button>
-          <Button
-            onClick={handleConfirmDelete}
-            color="error"
-            variant="contained"
+        <Typography variant="h4" gutterBottom>
+          {title}
+        </Typography>
+        {content.map((item, index) => (
+          <Accordion
+            key={index}
+            expanded={expandedIndex === index}
+            onChange={() => handleAccordionChange(index)}
           >
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="subtitle1">{item}</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              {editingIndex === index ? (
+                <Box>
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    value={editingContent}
+                    onChange={(e) => setEditingContent(e.target.value)}
+                  />
+                  <Box mt={1} display="flex" gap={1}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => handleUpdateContent(index)}
+                    >
+                      Save Changes
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      onClick={() => setEditingIndex(null)}
+                    >
+                      Cancel
+                    </Button>
+                  </Box>
+                </Box>
+              ) : (
+                <Box>
+                  <Typography variant="body1">{item}</Typography>
+                  {isOwner && (
+                    <Box mt={1} display="flex" gap={1}>
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        onClick={() => {
+                          setEditingIndex(index);
+                          setEditingContent(item);
+                        }}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        onClick={() => handleDeleteContent(index)}
+                      >
+                        Delete
+                      </Button>
+                    </Box>
+                  )}
+                </Box>
+              )}
+            </AccordionDetails>
+          </Accordion>
+        ))}
+      </Paper>
     </Container>
   );
 };
