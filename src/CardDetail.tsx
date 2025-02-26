@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Button,
   Container,
@@ -18,7 +18,7 @@ import { RootState } from "./redux/store/store";
 
 const CardDetail: React.FC = () => {
   const { id } = useParams();
-
+  const navigate = useNavigate();
   const [title, setTitle] = useState<string>("");
   const [content, setContent] = useState<string[]>([]);
   const [isOwner, setIsOwner] = useState<boolean>(false);
@@ -36,8 +36,10 @@ const CardDetail: React.FC = () => {
       setContent(event.eventContent);
       setIsOwner(userId === event.owner);
     };
-    if (id) {
+    if (id && userId !== "") {
       fetchEvent(id);
+    } else {
+      navigate("/signin");
     }
   }, [id, userId]);
 
