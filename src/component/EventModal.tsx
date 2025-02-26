@@ -10,9 +10,10 @@ import {
 } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
-import { useAppDispatch } from "../hooks/reduxHooks";
+import { useAppDispatch, useAppSelector } from "../hooks/reduxHooks";
 import { addEvent } from "../redux/reducer/user/userSlice";
 import { createEvent } from "../utils/Request/userEvent";
+import { RootState } from "../redux/store/store";
 
 type EventModalProp = {
   onOpen: boolean;
@@ -22,13 +23,18 @@ type EventModalProp = {
 const EventModal: React.FC<EventModalProp> = ({ onOpen, onClose }) => {
   const [title, setTitle] = useState<string>("");
   const [events, setEvents] = useState<string[]>([""]);
+  const { id } = useAppSelector((state: RootState) => state.user);
   const dispatch = useAppDispatch();
 
+  console.log(id);
   const handleCreateEvent = async () => {
     const allEvents = await createEvent({
       eventTitle: title,
       eventContent: events,
+      owner: id,
     });
+
+    console.log({ allEvents });
     const eventLength = allEvents.data.holdEvents.length;
     const eventId = allEvents.data.holdEvents[eventLength - 1];
     dispatch(

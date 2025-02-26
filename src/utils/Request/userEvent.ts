@@ -39,3 +39,13 @@ export const updateEvent = async (id: string, event: Event) => {
     throw error;
   }
 };
+
+export const getOneEvent = async (id: string) => {
+  try {
+    const response = await axiosInstance.get(`/events/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error getting one event", event);
+    throw error;
+  }
+};

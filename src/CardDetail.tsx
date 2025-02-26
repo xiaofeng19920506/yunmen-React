@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Button,
@@ -12,18 +12,26 @@ import {
   DialogActions,
   TextField,
 } from "@mui/material";
+import { getOneEvent } from "./utils/Request/userEvent";
 
 const CardDetail: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  console.log(id);
-
   const [openDialog, setOpenDialog] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState("Sample Card Title");
   const [content, setContent] = useState(
     "This is a sample content for the card. It can be longer if needed."
   );
+  useEffect(() => {
+    const fetchEvent = async (id: string) => {
+      const event = await getOneEvent(id);
+      console.log({ event });
+    };
+    if (id) {
+      fetchEvent(id);
+    }
+  }, [id]);
 
   const handleUpdate = async () => {
     console.log("Update card:", id);
@@ -47,7 +55,6 @@ const CardDetail: React.FC = () => {
 
   return (
     <Container maxWidth="md" sx={{ marginTop: 4 }}>
-      {/* Buttons at the top */}
       <Box display="flex" justifyContent="space-between" marginBottom={2}>
         {!isEditing ? (
           <>
