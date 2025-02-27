@@ -6,7 +6,6 @@ import { store } from "./redux/store/store";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
-import CheckInRoom from "./CheckInRoom";
 import CardDetail from "./CardDetail";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
@@ -17,7 +16,6 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
           <Route path="/" element={<App />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
-          <Route path="/room/:id" element={<CheckInRoom />} />
           <Route path="/cards/:id" element={<CardDetail />} />
         </Routes>
       </BrowserRouter>
