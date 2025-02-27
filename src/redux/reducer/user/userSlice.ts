@@ -46,7 +46,7 @@ export const userSlice = createSlice({
       state.location = action.payload;
     },
     logoutUser: (state) => {
-      return { ...initialState, location: state.location };
+      return initialState;
     },
   },
 });
