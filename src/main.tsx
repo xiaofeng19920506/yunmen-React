@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 import CardDetail from "./CardDetail";
+import ProtectedRoute from "./component/ProtectedRoute";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
@@ -16,7 +17,15 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
           <Route path="/" element={<App />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
-          <Route path="/cards/:id" element={<CardDetail />} />
+
+          <Route
+            path="/cards/:id"
+            element={
+              <ProtectedRoute>
+                <CardDetail />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </BrowserRouter>
     </Provider>

@@ -17,7 +17,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { getOneEvent } from "./utils/Request/userEvent";
 import { useAppDispatch, useAppSelector } from "./hooks/reduxHooks";
 import { RootState } from "./redux/store/store";
-import { logoutUser, updateLocation } from "./redux/reducer/user/userSlice";
+import { logoutUser } from "./redux/reducer/user/userSlice";
 
 const CardDetail: React.FC = () => {
   const { id } = useParams();
@@ -36,8 +36,6 @@ const CardDetail: React.FC = () => {
 
   const dispatch = useAppDispatch();
   const userId = useAppSelector((state: RootState) => state.user.id);
-  const location = useAppSelector((state: RootState) => state.user.location);
-  const currentLocation = useLocation();
 
   useEffect(() => {
     const fetchEvent = async (id: string) => {
@@ -46,20 +44,18 @@ const CardDetail: React.FC = () => {
       setContent(event.eventContent);
       setIsOwner(userId === event.owner);
     };
+
     if (id && userId !== "") {
       fetchEvent(id);
     } else {
-      dispatch(updateLocation(currentLocation.pathname));
-      navigate("/signin");
+      navigate("/signin", { state: { from: location } });
     }
-  }, [id, userId]);
+  }, [id, userId, location, navigate]);
 
-  // Initialize the selection state array whenever content changes
   useEffect(() => {
     setSelectedStatus(Array(content.length).fill(false));
   }, [content]);
 
-  // Owner handlers for Accordion view
   const handleAccordionChange = (index: number) => {
     setExpandedIndex(expandedIndex === index ? null : index);
   };
@@ -111,7 +107,7 @@ const CardDetail: React.FC = () => {
   };
 
   const handleBack = () => {
-    navigate(location);
+    navigate(-1);
   };
   return (
     <Container maxWidth="md" sx={{ marginTop: 4 }}>
