@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Button,
   Container,
@@ -14,7 +14,10 @@ import {
   Checkbox,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { getOneEvent } from "./utils/Request/userEvent";
+import {
+  getOneEvent,
+  updateEvent,
+} from "./utils/Request/userEvent";
 import { useAppDispatch, useAppSelector } from "./hooks/reduxHooks";
 import { RootState } from "./redux/store/store";
 import { logoutUser } from "./redux/reducer/user/userSlice";
@@ -26,13 +29,16 @@ const CardDetail: React.FC = () => {
   const [content, setContent] = useState<string[]>([]);
   const [isOwner, setIsOwner] = useState<boolean>(false);
 
-  // For owner view (Accordion editing)
+  // Editing states
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingContent, setEditingContent] = useState<string>("");
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
-  // For non-owner: Selection state
+  // Selection states (for non-owner)
   const [selectedStatus, setSelectedStatus] = useState<boolean[]>([]);
+
+  // New content state
+  const [newContent, setNewContent] = useState<string>("");
 
   const dispatch = useAppDispatch();
   const userId = useAppSelector((state: RootState) => state.user.id);
@@ -40,6 +46,7 @@ const CardDetail: React.FC = () => {
   useEffect(() => {
     const fetchEvent = async (id: string) => {
       const { event } = await getOneEvent(id);
+      console.log(event);
       setTitle(event.eventTitle);
       setContent(event.eventContent);
       setIsOwner(userId === event.owner);
@@ -61,10 +68,18 @@ const CardDetail: React.FC = () => {
   };
 
   const handleUpdateContent = async (index: number) => {
+    if (!isOwner) return;
     const updatedContent = [...content];
     updatedContent[index] = editingContent;
     setContent(updatedContent);
     setEditingIndex(null);
+    if (id) {
+      await updateEvent(id, {
+        _id: id,
+        eventTitle: title,
+        eventContent: updatedContent,
+      });
+    }
   };
 
   const handleDeleteContent = async (index: number) => {
@@ -75,16 +90,23 @@ const CardDetail: React.FC = () => {
     } else if (expandedIndex && expandedIndex > index) {
       setExpandedIndex(expandedIndex - 1);
     }
+
+    if (id) {
+      await updateEvent(id, {
+        _id: id,
+        eventTitle: title,
+        eventContent: updatedContent,
+      });
+      setContent(updatedContent);
+    }
   };
 
-  // Non-owner: Handle checkbox selection
   const handleCheckboxChange = (index: number) => {
     const newStatus = [...selectedStatus];
     newStatus[index] = !newStatus[index];
     setSelectedStatus(newStatus);
   };
 
-  // Handle Submit Button
   const handleSubmit = () => {
     const selectedItems = content.filter((_, index) => selectedStatus[index]);
 
@@ -93,12 +115,7 @@ const CardDetail: React.FC = () => {
       return;
     }
 
-    // Log selected items (Replace this with an API request if needed)
     console.log("Selected Items:", selectedItems);
-
-    // Example: Sending selection data to an API
-    // await submitSelectionToAPI({ userId, selectedItems });
-
     alert("Your selection has been submitted!");
   };
 
@@ -109,6 +126,18 @@ const CardDetail: React.FC = () => {
   const handleBack = () => {
     navigate(-1);
   };
+
+  // Function to add new content
+  const handleAddContent = async () => {
+    if (!newContent.trim()) return;
+    const updatedContent = [newContent, ...content]; // Add new content at the top
+    setContent(updatedContent);
+    setNewContent("");
+
+    // API call to update event content after adding new item
+    //await updateEventContent(id, updatedContent);
+  };
+
   return (
     <Container maxWidth="md" sx={{ marginTop: 4 }}>
       <div
@@ -131,72 +160,91 @@ const CardDetail: React.FC = () => {
         <Typography variant="h4" gutterBottom>
           {title}
         </Typography>
+
         {isOwner ? (
-          // Owner view with Accordions for editing/deleting event content
-          content.map((item, index) => (
-            <Accordion
-              key={index}
-              expanded={expandedIndex === index}
-              onChange={() => handleAccordionChange(index)}
-            >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="subtitle1">{item}</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                {editingIndex === index ? (
-                  <Box>
-                    <TextField
-                      fullWidth
-                      variant="outlined"
-                      value={editingContent}
-                      onChange={(e) => setEditingContent(e.target.value)}
-                    />
-                    <Box mt={1} display="flex" gap={1}>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={() => handleUpdateContent(index)}
-                      >
-                        Save Changes
-                      </Button>
-                      <Button
-                        variant="contained"
-                        color="secondary"
-                        onClick={() => setEditingIndex(null)}
-                      >
-                        Cancel
-                      </Button>
-                    </Box>
-                  </Box>
-                ) : (
-                  <Box>
-                    <Typography variant="body1">{item}</Typography>
-                    <Box mt={1} display="flex" gap={1}>
-                      <Button
+          <>
+            {/* Input field to add new content (Now on Top) */}
+            <Box mb={2} display="flex" gap={2}>
+              <TextField
+                fullWidth
+                variant="outlined"
+                label="Add New Content"
+                value={newContent}
+                onChange={(e) => setNewContent(e.target.value)}
+              />
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleAddContent}
+              >
+                Add
+              </Button>
+            </Box>
+
+            {content.map((item, index) => (
+              <Accordion
+                key={index}
+                expanded={expandedIndex === index}
+                onChange={() => handleAccordionChange(index)}
+              >
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography variant="subtitle1">{item}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  {editingIndex === index ? (
+                    <Box>
+                      <TextField
+                        fullWidth
                         variant="outlined"
-                        color="primary"
-                        onClick={() => {
-                          setEditingIndex(index);
-                          setEditingContent(item);
-                        }}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        color="error"
-                        onClick={() => handleDeleteContent(index)}
-                      >
-                        Delete
-                      </Button>
+                        value={editingContent}
+                        onChange={(e) => setEditingContent(e.target.value)}
+                      />
+                      <Box mt={1} display="flex" gap={1}>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={() => handleUpdateContent(index)}
+                        >
+                          Save Changes
+                        </Button>
+                        <Button
+                          variant="contained"
+                          color="secondary"
+                          onClick={() => setEditingIndex(null)}
+                        >
+                          Cancel
+                        </Button>
+                      </Box>
                     </Box>
-                  </Box>
-                )}
-              </AccordionDetails>
-            </Accordion>
-          ))
+                  ) : (
+                    <Box>
+                      <Typography variant="body1">{item}</Typography>
+                      <Box mt={1} display="flex" gap={1}>
+                        <Button
+                          variant="outlined"
+                          color="primary"
+                          onClick={() => {
+                            setEditingIndex(index);
+                            setEditingContent(item);
+                          }}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          onClick={() => handleDeleteContent(index)}
+                        >
+                          Delete
+                        </Button>
+                      </Box>
+                    </Box>
+                  )}
+                </AccordionDetails>
+              </Accordion>
+            ))}
+          </>
         ) : (
-          // Non-owner view: display checkboxes for event content
           <>
             {content.map((item, index) => (
               <FormControlLabel
@@ -211,7 +259,6 @@ const CardDetail: React.FC = () => {
                 sx={{ display: "block", mb: 1 }}
               />
             ))}
-            {/* Submit Button */}
             <Box mt={2}>
               <Button
                 variant="contained"

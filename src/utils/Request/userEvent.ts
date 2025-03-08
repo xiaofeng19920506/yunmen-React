@@ -1,5 +1,5 @@
 import axiosInstance from "./axios";
-
+import { Event } from "../../redux/reducer/user/userSlice";
 export const createEvent = async (eventData: any) => {
   try {
     const response = await axiosInstance.post("/events", eventData);

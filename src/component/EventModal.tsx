@@ -26,7 +26,6 @@ const EventModal: React.FC<EventModalProp> = ({ onOpen, onClose }) => {
   const { id } = useAppSelector((state: RootState) => state.user);
   const dispatch = useAppDispatch();
 
-  console.log(id);
   const handleCreateEvent = async () => {
     const allEvents = await createEvent({
       eventTitle: title,

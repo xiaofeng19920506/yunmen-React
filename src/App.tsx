@@ -8,13 +8,19 @@ import { stringAvatar } from "./utils/userUtil";
 import { updateModalState } from "./redux/reducer/eventModal/eventModalSlice";
 import EventModal from "./component/EventModal";
 import { getEvents } from "./utils/Request/userEvent";
-import { getAllEvents, logoutUser } from "./redux/reducer/user/userSlice";
+import {
+  getAllEvents,
+  logoutUser,
+  updateJoinedEvent,
+} from "./redux/reducer/user/userSlice";
 import DashboardCard from "./component/DashboardCard";
 
 const App = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { name, id, event } = useAppSelector((state: RootState) => state.user);
+  const { name, id, event, joinedEvent } = useAppSelector(
+    (state: RootState) => state.user
+  );
   const { open } = useAppSelector((state: RootState) => state.modal);
 
   const handleSignInClick = (): void => {
@@ -37,6 +43,8 @@ const App = () => {
     const fetchEvents = async () => {
       const events = await getEvents();
       dispatch(getAllEvents(events));
+      const joinedEvent = await getEvents();
+      dispatch(updateJoinedEvent(joinedEvent));
     };
     if (id) {
       fetchEvents();
@@ -85,31 +93,54 @@ const App = () => {
 
       {event?.length >= 1 ? (
         <Grid container spacing={3} justifyContent="center">
-          {event.map(({ _id, eventTitle, eventContent }, index) => (
-            <Grid
-              item
-              key={_id || `event-${index}`}
-              xs={12}
-              sm={6}
-              md={4}
-              lg={3}
-            >
-              <DashboardCard
-                id={_id}
-                title={eventTitle}
-                content={eventContent}
-              />
-            </Grid>
-          ))}
+          {event.map(({ _id, eventTitle, eventContent }, index) => {
+            return (
+              <Grid
+                item
+                key={_id || `event-${index}`}
+                xs={12}
+                sm={6}
+                md={4}
+                lg={3}
+              >
+                <DashboardCard
+                  id={_id}
+                  title={eventTitle}
+                  content={eventContent}
+                />
+              </Grid>
+            );
+          })}
         </Grid>
-      ) : id !== "" ? (
+      ) : id !== "" && joinedEvent?.length === 0 ? (
         <span style={{ textAlign: "center", marginTop: "20px" }}>
           There is no event going on
         </span>
-      ) : (
+      ) : joinedEvent?.length === 0 ? (
         <span style={{ textAlign: "center", marginTop: "20px" }}>
           Please Sign in to see your events
         </span>
+      ) : (
+        <Grid container spacing={3} justifyContent="center">
+          {joinedEvent?.map(({ _id, eventTitle, eventContent }, index) => {
+            return (
+              <Grid
+                item
+                key={_id || `event-${index}`}
+                xs={12}
+                sm={6}
+                md={4}
+                lg={3}
+              >
+                <DashboardCard
+                  id={_id}
+                  title={eventTitle}
+                  content={eventContent}
+                />
+              </Grid>
+            );
+          })}
+        </Grid>
       )}
 
       {/* Event modal */}
