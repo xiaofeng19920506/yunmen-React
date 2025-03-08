@@ -46,7 +46,6 @@ const CardDetail: React.FC = () => {
   useEffect(() => {
     const fetchEvent = async (id: string) => {
       const { event } = await getOneEvent(id);
-      console.log(event);
       setTitle(event.eventTitle);
       setContent(event.eventContent);
       setIsOwner(userId === event.owner);
@@ -73,6 +72,7 @@ const CardDetail: React.FC = () => {
     updatedContent[index] = editingContent;
     setContent(updatedContent);
     setEditingIndex(null);
+    setExpandedIndex(null);
     if (id) {
       await updateEvent(id, {
         _id: id,
@@ -130,14 +130,22 @@ const CardDetail: React.FC = () => {
   const handleDeleteEvent = async () => {
     if (id) {
       await deleteEvent(id);
-      navigate(-1);
+      navigate("/");
     }
   };
 
   const handleAddContent = async () => {
-    setContent(["", ...content]);
+    const updatedContent = ["", ...content];
+    setContent(updatedContent);
     setExpandedIndex(0);
     setEditingIndex(0);
+    if (id) {
+      await updateEvent(id, {
+        _id: id,
+        eventTitle: title,
+        eventContent: updatedContent,
+      });
+    }
   };
 
   return (
@@ -172,9 +180,7 @@ const CardDetail: React.FC = () => {
               padding: "4px 10px", // Reduce padding for a compact look
               minWidth: "auto", // Prevents unnecessary stretching
             }}
-            onClick={() => {
-              handleDeleteEvent;
-            }}
+            onClick={handleDeleteEvent}
           >
             Delete
           </Button>
