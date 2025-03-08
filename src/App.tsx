@@ -11,16 +11,18 @@ import { getEvents } from "./utils/Request/userEvent";
 import {
   getAllEvents,
   logoutUser,
-  updateJoinedEvent,
+  Event,
 } from "./redux/reducer/user/userSlice";
 import DashboardCard from "./component/DashboardCard";
 
+interface GetEventsResponse {
+  events: Event[];
+  joinedEvents: Event[];
+}
 const App = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { name, id, event, joinedEvent } = useAppSelector(
-    (state: RootState) => state.user
-  );
+  const { name, id, event } = useAppSelector((state: RootState) => state.user);
   const { open } = useAppSelector((state: RootState) => state.modal);
 
   const handleSignInClick = (): void => {
@@ -41,10 +43,16 @@ const App = () => {
 
   useEffect(() => {
     const fetchEvents = async () => {
-      const events = await getEvents();
-      dispatch(getAllEvents(events));
-      const joinedEvent = await getEvents();
-      dispatch(updateJoinedEvent(joinedEvent));
+      const { events, joinedEvents }: GetEventsResponse = await getEvents();
+      const combined: Event[] = events.concat(joinedEvents);
+      const allEvents: Event[] = combined.filter(
+        (event, index, self) =>
+          index ===
+          self.findIndex(
+            (e: Event) => e._id.toString() === event._id.toString()
+          )
+      );
+      dispatch(getAllEvents(allEvents));
     };
     if (id) {
       fetchEvents();
@@ -112,35 +120,14 @@ const App = () => {
             );
           })}
         </Grid>
-      ) : id !== "" && joinedEvent?.length === 0 ? (
+      ) : id !== "" ? (
         <span style={{ textAlign: "center", marginTop: "20px" }}>
           There is no event going on
         </span>
-      ) : joinedEvent?.length === 0 ? (
+      ) : (
         <span style={{ textAlign: "center", marginTop: "20px" }}>
           Please Sign in to see your events
         </span>
-      ) : (
-        <Grid container spacing={3} justifyContent="center">
-          {joinedEvent?.map(({ _id, eventTitle, eventContent }, index) => {
-            return (
-              <Grid
-                item
-                key={_id || `event-${index}`}
-                xs={12}
-                sm={6}
-                md={4}
-                lg={3}
-              >
-                <DashboardCard
-                  id={_id}
-                  title={eventTitle}
-                  content={eventContent}
-                />
-              </Grid>
-            );
-          })}
-        </Grid>
       )}
 
       {/* Event modal */}

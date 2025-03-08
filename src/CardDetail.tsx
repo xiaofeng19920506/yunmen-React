@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
+  deleteEvent,
   getOneEvent,
   updateEvent,
 } from "./utils/Request/userEvent";
@@ -37,7 +38,6 @@ const CardDetail: React.FC = () => {
   // Selection states (for non-owner)
   const [selectedStatus, setSelectedStatus] = useState<boolean[]>([]);
 
-  // New content state
   const [newContent, setNewContent] = useState<string>("");
 
   const dispatch = useAppDispatch();
@@ -127,15 +127,17 @@ const CardDetail: React.FC = () => {
     navigate(-1);
   };
 
-  // Function to add new content
-  const handleAddContent = async () => {
-    if (!newContent.trim()) return;
-    const updatedContent = [newContent, ...content]; // Add new content at the top
-    setContent(updatedContent);
-    setNewContent("");
+  const handleDeleteEvent = async () => {
+    if (id) {
+      await deleteEvent(id);
+      navigate(-1);
+    }
+  };
 
-    // API call to update event content after adding new item
-    //await updateEventContent(id, updatedContent);
+  const handleAddContent = async () => {
+    setContent(["", ...content]);
+    setExpandedIndex(0);
+    setEditingIndex(0);
   };
 
   return (
@@ -157,9 +159,26 @@ const CardDetail: React.FC = () => {
       </div>
 
       <Paper elevation={3} sx={{ padding: 3 }}>
-        <Typography variant="h4" gutterBottom>
-          {title}
-        </Typography>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <Typography variant="h4" gutterBottom>
+            {title}
+          </Typography>
+          <Button
+            variant="outlined"
+            color="error"
+            size="small"
+            sx={{
+              height: "80%",
+              padding: "4px 10px", // Reduce padding for a compact look
+              minWidth: "auto", // Prevents unnecessary stretching
+            }}
+            onClick={() => {
+              handleDeleteEvent;
+            }}
+          >
+            Delete
+          </Button>
+        </div>
 
         {isOwner ? (
           <>

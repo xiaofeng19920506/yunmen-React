@@ -6,7 +6,6 @@ interface userState {
   email: string;
   name: string;
   event: Event[];
-  joinedEvent: Event[];
   id: string;
 }
 
@@ -20,7 +19,6 @@ const initialState: userState = {
   email: "",
   name: "",
   event: [],
-  joinedEvent: [],
   id: "",
 };
 
@@ -42,9 +40,6 @@ export const userSlice = createSlice({
         event._id === action.payload._id ? action.payload : event
       );
     },
-    updateJoinedEvent: (state, action: PayloadAction<Event[]>) => {
-      state.joinedEvent = action.payload;
-    },
     logoutUser: (_state) => {
       return initialState;
     },
@@ -53,7 +48,6 @@ export const userSlice = createSlice({
 
 export const {
   updateUser,
-  updateJoinedEvent,
   logoutUser,
   addEvent,
   getAllEvents,
