@@ -174,33 +174,35 @@ const CardDetail: React.FC = () => {
           <Typography variant="h4" gutterBottom>
             {title}
           </Typography>
-          <div style={{ display: "flex", gap: "5px" }}>
-            <Button
-              variant="outlined"
-              color="error"
-              size="small"
-              sx={{
-                height: "80%",
-                padding: "4px 10px", // Reduce padding for a compact look
-                minWidth: "auto", // Prevents unnecessary stretching
-              }}
-              onClick={handleDeleteEvent}
-            >
-              Delete
-            </Button>
-            <Button
-              variant="outlined"
-              size="small"
-              sx={{
-                height: "80%",
-                padding: "4px 10px", // Reduce padding for a compact look
-                minWidth: "auto", // Prevents unnecessary stretching
-              }}
-              onClick={handleInviteModal}
-            >
-              Invite
-            </Button>
-          </div>
+          {isOwner && (
+            <div style={{ display: "flex", gap: "5px" }}>
+              <Button
+                variant="outlined"
+                color="error"
+                size="small"
+                sx={{
+                  height: "80%",
+                  padding: "4px 10px", // Reduce padding for a compact look
+                  minWidth: "auto", // Prevents unnecessary stretching
+                }}
+                onClick={handleDeleteEvent}
+              >
+                Delete
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                sx={{
+                  height: "80%",
+                  padding: "4px 10px", // Reduce padding for a compact look
+                  minWidth: "auto", // Prevents unnecessary stretching
+                }}
+                onClick={handleInviteModal}
+              >
+                Invite
+              </Button>
+            </div>
+          )}
         </div>
 
         {isOwner ? (
