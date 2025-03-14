@@ -68,7 +68,6 @@ const App = () => {
         padding: "20px",
       }}
     >
-      {/* Header with sign in/up or event actions */}
       <div
         style={{
           display: "flex",

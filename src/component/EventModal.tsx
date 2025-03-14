@@ -33,7 +33,6 @@ const EventModal: React.FC<EventModalProp> = ({ onOpen, onClose }) => {
       owner: id,
     });
 
-    console.log({ allEvents });
     const eventLength = allEvents.data.holdEvents.length;
     const eventId = allEvents.data.holdEvents[eventLength - 1];
     dispatch(

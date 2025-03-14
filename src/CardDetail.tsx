@@ -22,6 +22,7 @@ import {
 import { useAppDispatch, useAppSelector } from "./hooks/reduxHooks";
 import { RootState } from "./redux/store/store";
 import { logoutUser } from "./redux/reducer/user/userSlice";
+import InviteModal from "./component/InviteModal";
 
 const CardDetail: React.FC = () => {
   const { id } = useParams();
@@ -29,13 +30,11 @@ const CardDetail: React.FC = () => {
   const [title, setTitle] = useState<string>("");
   const [content, setContent] = useState<string[]>([]);
   const [isOwner, setIsOwner] = useState<boolean>(false);
-
-  // Editing states
+  const [open, setOpen] = useState<boolean>(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingContent, setEditingContent] = useState<string>("");
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
-  // Selection states (for non-owner)
   const [selectedStatus, setSelectedStatus] = useState<boolean[]>([]);
 
   const [newContent, setNewContent] = useState<string>("");
@@ -135,17 +134,21 @@ const CardDetail: React.FC = () => {
   };
 
   const handleAddContent = async () => {
-    const updatedContent = ["", ...content];
-    setContent(updatedContent);
-    setExpandedIndex(0);
-    setEditingIndex(0);
-    if (id) {
-      await updateEvent(id, {
-        _id: id,
-        eventTitle: title,
-        eventContent: updatedContent,
-      });
+    if (newContent !== "") {
+      const updatedContent = [newContent, ...content];
+      setContent(updatedContent);
+      if (id) {
+        await updateEvent(id, {
+          _id: id,
+          eventTitle: title,
+          eventContent: updatedContent,
+        });
+      }
     }
+  };
+
+  const handleInviteModal = () => {
+    setOpen(true);
   };
 
   return (
@@ -171,19 +174,33 @@ const CardDetail: React.FC = () => {
           <Typography variant="h4" gutterBottom>
             {title}
           </Typography>
-          <Button
-            variant="outlined"
-            color="error"
-            size="small"
-            sx={{
-              height: "80%",
-              padding: "4px 10px", // Reduce padding for a compact look
-              minWidth: "auto", // Prevents unnecessary stretching
-            }}
-            onClick={handleDeleteEvent}
-          >
-            Delete
-          </Button>
+          <div style={{ display: "flex", gap: "5px" }}>
+            <Button
+              variant="outlined"
+              color="error"
+              size="small"
+              sx={{
+                height: "80%",
+                padding: "4px 10px", // Reduce padding for a compact look
+                minWidth: "auto", // Prevents unnecessary stretching
+              }}
+              onClick={handleDeleteEvent}
+            >
+              Delete
+            </Button>
+            <Button
+              variant="outlined"
+              size="small"
+              sx={{
+                height: "80%",
+                padding: "4px 10px", // Reduce padding for a compact look
+                minWidth: "auto", // Prevents unnecessary stretching
+              }}
+              onClick={handleInviteModal}
+            >
+              Invite
+            </Button>
+          </div>
         </div>
 
         {isOwner ? (
@@ -243,7 +260,6 @@ const CardDetail: React.FC = () => {
                     </Box>
                   ) : (
                     <Box>
-                      <Typography variant="body1">{item}</Typography>
                       <Box mt={1} display="flex" gap={1}>
                         <Button
                           variant="outlined"
@@ -297,6 +313,11 @@ const CardDetail: React.FC = () => {
           </>
         )}
       </Paper>
+      <InviteModal
+        open={open}
+        onCancel={() => setOpen(false)}
+        eventId={id || ""}
+      ></InviteModal>
     </Container>
   );
 };

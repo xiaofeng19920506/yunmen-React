@@ -7,6 +7,8 @@ interface userState {
   name: string;
   event: Event[];
   id: string;
+  popMessage: string;
+  show: boolean;
 }
 
 export type Event = {
@@ -20,6 +22,8 @@ const initialState: userState = {
   name: "",
   event: [],
   id: "",
+  popMessage: "",
+  show: false,
 };
 
 export const userSlice = createSlice({
@@ -43,6 +47,12 @@ export const userSlice = createSlice({
     logoutUser: (_state) => {
       return initialState;
     },
+    updateMessage: (state, action: PayloadAction<string>) => {
+      state.popMessage = action.payload;
+    },
+    showPopUp: (state, action: PayloadAction<boolean>) => {
+      state.show = action.payload;
+    },
   },
 });
 
@@ -52,6 +62,8 @@ export const {
   addEvent,
   getAllEvents,
   updateEvent,
+  updateMessage,
+  showPopUp,
 } = userSlice.actions;
 export const user = (state: RootState) => state.user.email;
 export default userSlice.reducer;
