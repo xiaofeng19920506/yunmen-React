@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import { useAppDispatch } from "../hooks/reduxHooks";
 import { showPopUp, updateMessage } from "../redux/reducer/user/userSlice";
+import { inviteUser } from "../utils/Request/userEvent";
 
 interface InviteUserModalProps {
   open: boolean;
@@ -26,6 +27,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({
   const handleConfirm = async () => {
     try {
       if (eventId !== "") {
+        await inviteUser(email, eventId);
         dispatch(updateMessage("User Invited"));
         dispatch(showPopUp(true));
         setEmail("");
