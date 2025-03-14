@@ -30,7 +30,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({
         await inviteUser(email, eventId);
         dispatch(updateMessage("User Invited"));
         dispatch(showPopUp(true));
-        setEmail("");
+        handleCancel();
       }
     } catch (error) {
       console.error(error);

@@ -51,7 +51,7 @@ export const getOneEvent = async (id: string) => {
 };
 export const inviteUser = async (email: string, id: string) => {
   try {
-    const response = await axiosInstance.post(`/events/invite/`, {
+    const response = await axiosInstance.post(`/events/invite`, {
       email,
       id,
     });

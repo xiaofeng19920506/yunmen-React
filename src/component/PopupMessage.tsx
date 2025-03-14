@@ -1,5 +1,5 @@
-import React from 'react';
-import { Snackbar, Alert } from '@mui/material';
+import React from "react";
+import { Snackbar, Alert } from "@mui/material";
 
 interface PopUpMessageProps {
   message: string;
@@ -7,15 +7,19 @@ interface PopUpMessageProps {
   onClose: () => void;
 }
 
-const PopUpMessage: React.FC<PopUpMessageProps> = ({ message, open, onClose }) => {
+const PopUpMessage: React.FC<PopUpMessageProps> = ({
+  message,
+  open,
+  onClose,
+}) => {
   return (
     <Snackbar
-      anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      anchorOrigin={{ vertical: "top", horizontal: "center" }}
       open={open}
-      autoHideDuration={5000}
+      autoHideDuration={2000}
       onClose={onClose}
     >
-      <Alert onClose={onClose} severity="info" sx={{ width: '100%' }}>
+      <Alert onClose={onClose} severity="info" sx={{ width: "100%" }}>
         {message}
       </Alert>
     </Snackbar>
