@@ -13,10 +13,20 @@ const SignIn: React.FC = () => {
   const dispatch = useAppDispatch();
   const location = useLocation();
   const from = (location.state as any)?.from?.pathname || "/";
-  const loginUser = async (email: string, password: string) => {
+  const loginUser = async (userEmail: string, password: string) => {
     try {
-      const { user, token } = await login(email, password);
-      dispatch(updateUser({ ...user }));
+      const { user, token } = await login(userEmail, password);
+      const { email, id, name } = user;
+      dispatch(
+        updateUser({
+          email,
+          id,
+          name,
+          events: [],
+          popMessage: "",
+          show: false,
+        })
+      );
       Cookie.set("jwt", token, { expires: 1 });
       navigate(from, { replace: true });
     } catch (error) {

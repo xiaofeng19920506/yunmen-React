@@ -40,6 +40,7 @@ export const userSlice = createSlice({
       return action.payload;
     },
     getAllEvents: (state, action: PayloadAction<Event[]>) => {
+      console.log(action.payload);
       state.events = action.payload;
     },
     addEvent: (state, action: PayloadAction<Event>) => {

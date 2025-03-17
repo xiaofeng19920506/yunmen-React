@@ -45,6 +45,7 @@ const App = () => {
     const fetchEvents = async () => {
       try {
         const events: Event[] = await getEvents();
+        console.log({ events });
         dispatch(getAllEvents(events));
       } catch (error) {
         console.error("Error fetching events:", error);
