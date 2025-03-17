@@ -1,5 +1,5 @@
 import axiosInstance from "./axios";
-import { Event } from "../../redux/reducer/user/userSlice";
+import { Event, EventContent } from "../../redux/reducer/user/userSlice";
 export const createEvent = async (eventData: any) => {
   try {
     const response = await axiosInstance.post("/events", eventData);
@@ -58,6 +58,16 @@ export const inviteUser = async (email: string, id: string) => {
     return response.data.data;
   } catch (error) {
     console.error("Error getting one event", event);
+    throw error;
+  }
+};
+
+export const voteSelection = async (id: string, selection: EventContent[]) => {
+  try {
+    const response = await axiosInstance.post(`/events/${id}`, selection);
+    return response.data;
+  } catch (error) {
+    console.error("error getting vote", error);
     throw error;
   }
 };

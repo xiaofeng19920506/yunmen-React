@@ -4,11 +4,12 @@ import Card from "@mui/material/Card";
 import CardActionArea from "@mui/material/CardActionArea";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
+import { EventContent } from "../redux/reducer/user/userSlice";
 
 interface DashboardCardProps {
   id: string;
   title: string;
-  content: string[];
+  content: EventContent[];
 }
 
 const DashboardCard: React.FC<DashboardCardProps> = ({
@@ -23,11 +24,25 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
   };
 
   return (
-    <Card sx={{ width: "100%", maxWidth: 400, margin: 2 }}>
-      <CardActionArea onClick={handleCardClick}>
-        <CardContent>
+    <Card
+      sx={{
+        width: 300,
+        height: 200,
+        margin: 2,
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <CardActionArea onClick={handleCardClick} sx={{ height: "100%" }}>
+        <CardContent
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 1.5,
+            padding: 2,
+          }}
+        >
           <Typography
-            gutterBottom
             variant="h6"
             component="div"
             sx={{
@@ -35,6 +50,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
               overflow: "hidden",
               textOverflow: "ellipsis",
               maxWidth: "100%",
+              fontWeight: "bold",
             }}
           >
             {title}
@@ -48,9 +64,10 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
               WebkitLineClamp: 3,
               overflow: "hidden",
               textOverflow: "ellipsis",
+              flexGrow: 1,
             }}
           >
-            {content.join(" ")}
+            {/* {content.map({})} */}
           </Typography>
         </CardContent>
       </CardActionArea>

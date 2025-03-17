@@ -5,22 +5,28 @@ import type { RootState } from "../../store/store";
 interface userState {
   email: string;
   name: string;
-  event: Event[];
+  events: Event[];
   id: string;
   popMessage: string;
   show: boolean;
 }
 
-export type Event = {
+export interface Event {
   _id: string;
   eventTitle: string;
-  eventContent: string[];
-};
+  eventContent: EventContent[];
+  owner: string;
+}
+
+export interface EventContent {
+  content: string;
+  joinedUser: string[];
+}
 
 const initialState: userState = {
   email: "",
   name: "",
-  event: [],
+  events: [],
   id: "",
   popMessage: "",
   show: false,
@@ -34,13 +40,13 @@ export const userSlice = createSlice({
       return action.payload;
     },
     getAllEvents: (state, action: PayloadAction<Event[]>) => {
-      state.event = action.payload;
+      state.events = action.payload;
     },
     addEvent: (state, action: PayloadAction<Event>) => {
-      state.event = [...state.event, action.payload];
+      state.events = [...state.events, action.payload];
     },
     updateEvent: (state, action: PayloadAction<Event>) => {
-      state.event = state.event.map((event) =>
+      state.events = state.events.map((event) =>
         event._id === action.payload._id ? action.payload : event
       );
     },

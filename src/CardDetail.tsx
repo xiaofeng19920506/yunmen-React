@@ -18,17 +18,18 @@ import {
   deleteEvent,
   getOneEvent,
   updateEvent,
+  voteSelection,
 } from "./utils/Request/userEvent";
 import { useAppDispatch, useAppSelector } from "./hooks/reduxHooks";
 import { RootState } from "./redux/store/store";
-import { logoutUser } from "./redux/reducer/user/userSlice";
+import { EventContent, logoutUser } from "./redux/reducer/user/userSlice";
 import InviteModal from "./component/InviteModal";
 
 const CardDetail: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [title, setTitle] = useState<string>("");
-  const [content, setContent] = useState<string[]>([]);
+  const [content, setContent] = useState<EventContent[]>([]);
   const [isOwner, setIsOwner] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -44,10 +45,10 @@ const CardDetail: React.FC = () => {
 
   useEffect(() => {
     const fetchEvent = async (id: string) => {
-      const { event } = await getOneEvent(id);
-      setTitle(event.eventTitle);
-      setContent(event.eventContent);
-      setIsOwner(userId === event.owner);
+      const { events } = await getOneEvent(id);
+      setTitle(events.eventTitle);
+      setContent(events.eventContent);
+      setIsOwner(userId === events.owner);
     };
 
     if (id && userId !== "") {
@@ -68,7 +69,7 @@ const CardDetail: React.FC = () => {
   const handleUpdateContent = async (index: number) => {
     if (!isOwner) return;
     const updatedContent = [...content];
-    updatedContent[index] = editingContent;
+    updatedContent[index].content = editingContent;
     setContent(updatedContent);
     setEditingIndex(null);
     setExpandedIndex(null);
@@ -77,6 +78,7 @@ const CardDetail: React.FC = () => {
         _id: id,
         eventTitle: title,
         eventContent: updatedContent,
+        owner: userId,
       });
     }
   };
@@ -95,6 +97,7 @@ const CardDetail: React.FC = () => {
         _id: id,
         eventTitle: title,
         eventContent: updatedContent,
+        owner: userId,
       });
       setContent(updatedContent);
     }
@@ -106,7 +109,7 @@ const CardDetail: React.FC = () => {
     setSelectedStatus(newStatus);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const selectedItems = content.filter((_, index) => selectedStatus[index]);
 
     if (selectedItems.length === 0) {
@@ -116,6 +119,9 @@ const CardDetail: React.FC = () => {
 
     console.log("Selected Items:", selectedItems);
     alert("Your selection has been submitted!");
+    const data = await voteSelection(id || "", selectedItems);
+    console.log(data);
+    handleBack();
   };
 
   const handleLogout = () => {
@@ -135,13 +141,17 @@ const CardDetail: React.FC = () => {
 
   const handleAddContent = async () => {
     if (newContent !== "") {
-      const updatedContent = [newContent, ...content];
+      const updatedContent = [
+        { content: newContent, joinedUser: [] },
+        ...content,
+      ];
       setContent(updatedContent);
       if (id) {
         await updateEvent(id, {
           _id: id,
           eventTitle: title,
           eventContent: updatedContent,
+          owner: userId,
         });
       }
     }
@@ -194,8 +204,8 @@ const CardDetail: React.FC = () => {
                 size="small"
                 sx={{
                   height: "80%",
-                  padding: "4px 10px", // Reduce padding for a compact look
-                  minWidth: "auto", // Prevents unnecessary stretching
+                  padding: "4px 10px",
+                  minWidth: "auto",
                 }}
                 onClick={handleInviteModal}
               >
@@ -207,7 +217,6 @@ const CardDetail: React.FC = () => {
 
         {isOwner ? (
           <>
-            {/* Input field to add new content (Now on Top) */}
             <Box mb={2} display="flex" gap={2}>
               <TextField
                 fullWidth
@@ -232,7 +241,7 @@ const CardDetail: React.FC = () => {
                 onChange={() => handleAccordionChange(index)}
               >
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography variant="subtitle1">{item}</Typography>
+                  <Typography variant="subtitle1">{item.content}</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   {editingIndex === index ? (
@@ -268,7 +277,7 @@ const CardDetail: React.FC = () => {
                           color="primary"
                           onClick={() => {
                             setEditingIndex(index);
-                            setEditingContent(item);
+                            setEditingContent(item.content);
                           }}
                         >
                           Edit
@@ -295,10 +304,12 @@ const CardDetail: React.FC = () => {
                 control={
                   <Checkbox
                     checked={selectedStatus[index]}
-                    onChange={() => handleCheckboxChange(index)}
+                    onChange={() => {
+                      handleCheckboxChange(index);
+                    }}
                   />
                 }
-                label={item}
+                label={item.content}
                 sx={{ display: "block", mb: 1 }}
               />
             ))}
