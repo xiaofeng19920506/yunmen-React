@@ -82,72 +82,74 @@ const App = () => {
   );
 
   const renderContent = () => {
-    if (loading) {
-      return <Loading />;
-    } else {
-      if (!id) {
-        return (
-          <Typography variant="h6" textAlign="center" mt={4}>
-            Please sign in to view your events
-          </Typography>
-        );
-      }
-      if (events?.length === 0) {
-        return (
-          <Typography variant="h6" textAlign="center" mt={4}>
-            There are currently no events
-          </Typography>
-        );
-      }
-
+    if (!id) {
       return (
-        <Grid container spacing={3} justifyContent="center">
-          {events?.length > 0 &&
-            events.map((event) => (
-              <Grid
-                item
-                key={event._id}
-                xs={12}
-                sm={6}
-                md={4}
-                lg={3}
-                display="flex"
-                justifyContent="center"
-              >
-                <DashboardCard
-                  id={event?._id || ""}
-                  title={event.eventTitle}
-                  content={event.eventContent}
-                />
-              </Grid>
-            ))}
-        </Grid>
+        <Typography variant="h6" textAlign="center" mt={4}>
+          Please sign in to view your events
+        </Typography>
       );
     }
+    if (events?.length === 0) {
+      return (
+        <Typography variant="h6" textAlign="center" mt={4}>
+          There are currently no events
+        </Typography>
+      );
+    }
+
+    return (
+      <Grid container spacing={3} justifyContent="center">
+        {events?.length > 0 &&
+          events.map((event) => (
+            <Grid
+              item
+              key={event._id}
+              xs={12}
+              sm={6}
+              md={4}
+              lg={3}
+              display="flex"
+              justifyContent="center"
+            >
+              <DashboardCard
+                id={event?._id || ""}
+                title={event.eventTitle}
+                content={event.eventContent}
+              />
+            </Grid>
+          ))}
+      </Grid>
+    );
   };
 
   return (
-    <Container
-      maxWidth="xl"
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        minHeight: "100vh",
-        py: 4,
-        px: { xs: 2, sm: 3 },
-      }}
-    >
-      <Box display="flex" justifyContent="flex-end" gap={2} mb={4}>
-        {id ? renderUserSection() : renderAuthButtons()}
-      </Box>
+    <>
+      {loading ? (
+        <Loading />
+      ) : (
+        <Container
+          maxWidth="xl"
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            minHeight: "100vh",
+            py: 4,
+            px: { xs: 2, sm: 3 },
+          }}
+        >
+          <Box display="flex" justifyContent="flex-end" gap={2} mb={4}>
+            {id ? renderUserSection() : renderAuthButtons()}
+          </Box>
 
-      {renderContent()}
+          {renderContent()}
 
-      <EventModal
-        onOpen={open}
-        onClose={() => dispatch(updateModalState(false))}
-      />
-    </Container>
+          <EventModal
+            onOpen={open}
+            onClose={() => dispatch(updateModalState(false))}
+          />
+        </Container>
+      )}
+    </>
   );
 };
 
