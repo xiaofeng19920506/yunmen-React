@@ -24,6 +24,7 @@ import { useAppDispatch, useAppSelector } from "./hooks/reduxHooks";
 import { RootState } from "./redux/store/store";
 import { EventContent, logoutUser } from "./redux/reducer/user/userSlice";
 import InviteModal from "./component/InviteModal";
+import Loading from "./component/Loading"; // Ensure you have this component
 
 const CardDetail: React.FC = () => {
   const { id } = useParams();
@@ -35,20 +36,26 @@ const CardDetail: React.FC = () => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingContent, setEditingContent] = useState<string>("");
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
-
   const [selectedStatus, setSelectedStatus] = useState<boolean[]>([]);
-
   const [newContent, setNewContent] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
 
   const dispatch = useAppDispatch();
   const userId = useAppSelector((state: RootState) => state.user.id);
 
   useEffect(() => {
     const fetchEvent = async (id: string) => {
-      const { event } = await getOneEvent(id);
-      setTitle(event.eventTitle);
-      setContent(event.eventContent);
-      setIsOwner(userId === event.owner);
+      setLoading(true);
+      try {
+        const { event } = await getOneEvent(id);
+        setTitle(event.eventTitle);
+        setContent(event.eventContent);
+        setIsOwner(userId === event.owner);
+      } catch (error) {
+        console.error("Error fetching event:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     if (id && userId !== "") {
@@ -56,7 +63,7 @@ const CardDetail: React.FC = () => {
     } else {
       navigate("/signin", { state: { from: location } });
     }
-  }, [id, userId, location, navigate]);
+  }, [id, userId, navigate]);
 
   useEffect(() => {
     const computedStatus = content.map(({ joinedUser }) =>
@@ -102,7 +109,6 @@ const CardDetail: React.FC = () => {
         eventContent: updatedContent,
         owner: userId,
       });
-      setContent(updatedContent);
     }
   };
 
@@ -114,8 +120,9 @@ const CardDetail: React.FC = () => {
 
   const handleSubmit = async () => {
     const selectedItems = content.filter((_, index) => selectedStatus[index]);
-
+    setLoading(true);
     await voteSelection(id || "", selectedItems);
+    setLoading(false);
     handleBack();
   };
 
@@ -141,6 +148,7 @@ const CardDetail: React.FC = () => {
         ...content,
       ];
       setContent(updatedContent);
+      setNewContent("");
       if (id) {
         await updateEvent(id, {
           _id: id,
@@ -157,179 +165,181 @@ const CardDetail: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ marginTop: 4 }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          gap: "1rem",
-          marginBottom: "20px",
-        }}
-      >
-        <Button variant="contained" onClick={handleBack}>
-          Back
-        </Button>
-        <Button variant="contained" onClick={handleLogout}>
-          Log Out
-        </Button>
-      </div>
+    <>
+      {loading ? (
+        <Loading />
+      ) : (
+        <Container maxWidth="md" sx={{ marginTop: 4 }}>
+          <Box
+            display="flex"
+            justifyContent="flex-end"
+            gap="1rem"
+            marginBottom="20px"
+          >
+            <Button variant="contained" onClick={handleBack}>
+              Back
+            </Button>
+            <Button variant="contained" onClick={handleLogout}>
+              Log Out
+            </Button>
+          </Box>
 
-      <Paper elevation={3} sx={{ padding: 3 }}>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <Typography variant="h4" gutterBottom>
-            {title}
-          </Typography>
-          {isOwner && (
-            <div style={{ display: "flex", gap: "5px" }}>
-              <Button
-                variant="outlined"
-                color="error"
-                size="small"
-                sx={{
-                  height: "80%",
-                  padding: "4px 10px", // Reduce padding for a compact look
-                  minWidth: "auto", // Prevents unnecessary stretching
-                }}
-                onClick={handleDeleteEvent}
-              >
-                Delete
-              </Button>
-              <Button
-                variant="outlined"
-                size="small"
-                sx={{
-                  height: "80%",
-                  padding: "4px 10px",
-                  minWidth: "auto",
-                }}
-                onClick={handleInviteModal}
-              >
-                Invite
-              </Button>
-            </div>
-          )}
-        </div>
-
-        {isOwner ? (
-          <>
-            <Box mb={2} display="flex" gap={2}>
-              <TextField
-                fullWidth
-                variant="outlined"
-                label="Add New Content"
-                value={newContent}
-                onChange={(e) => setNewContent(e.target.value)}
-              />
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleAddContent}
-              >
-                Add
-              </Button>
-            </Box>
-
-            {content.map((item, index) => (
-              <Accordion
-                key={item?._id || index}
-                expanded={expandedIndex === index}
-                onChange={() => handleAccordionChange(index)}
-              >
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography variant="subtitle1">{`${item.content} - ${
-                    item.joinedUser.length
-                  } ${
-                    item.joinedUser.length > 1 ? "users" : "user"
-                  } joined`}</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  {editingIndex === index ? (
-                    <Box>
-                      <TextField
-                        fullWidth
-                        variant="outlined"
-                        value={editingContent}
-                        onChange={(e) => setEditingContent(e.target.value)}
-                      />
-                      <Box mt={1} display="flex" gap={1}>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={() => handleUpdateContent(index)}
-                        >
-                          Save Changes
-                        </Button>
-                        <Button
-                          variant="contained"
-                          color="secondary"
-                          onClick={() => setEditingIndex(null)}
-                        >
-                          Cancel
-                        </Button>
-                      </Box>
-                    </Box>
-                  ) : (
-                    <Box>
-                      <Box mt={1} display="flex" gap={1}>
-                        <Button
-                          variant="outlined"
-                          color="primary"
-                          onClick={() => {
-                            setEditingIndex(index);
-                            setEditingContent(item.content);
-                          }}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          color="error"
-                          onClick={() => handleDeleteContent(index)}
-                        >
-                          Delete
-                        </Button>
-                      </Box>
-                    </Box>
-                  )}
-                </AccordionDetails>
-              </Accordion>
-            ))}
-          </>
-        ) : (
-          <>
-            {content.map((item, index) => (
-              <FormControlLabel
-                key={item?._id || index}
-                control={
-                  <Checkbox
-                    checked={selectedStatus[index] || false}
-                    onChange={() => {
-                      handleCheckboxChange(index);
+          <Paper elevation={3} sx={{ padding: 3 }}>
+            <Box display="flex" justifyContent="space-between">
+              <Typography variant="h4" gutterBottom>
+                {title}
+              </Typography>
+              {isOwner && (
+                <Box display="flex" gap="5px">
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    size="small"
+                    sx={{
+                      height: "80%",
+                      padding: "4px 10px",
+                      minWidth: "auto",
                     }}
-                  />
-                }
-                label={item.content}
-                sx={{ display: "block", mb: 1 }}
-              />
-            ))}
-            <Box mt={2}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleSubmit}
-              >
-                Submit Selection
-              </Button>
+                    onClick={handleDeleteEvent}
+                  >
+                    Delete
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    sx={{
+                      height: "80%",
+                      padding: "4px 10px",
+                      minWidth: "auto",
+                    }}
+                    onClick={handleInviteModal}
+                  >
+                    Invite
+                  </Button>
+                </Box>
+              )}
             </Box>
-          </>
-        )}
-      </Paper>
-      <InviteModal
-        open={open}
-        onCancel={() => setOpen(false)}
-        eventId={id || ""}
-      ></InviteModal>
-    </Container>
+
+            {isOwner ? (
+              <>
+                <Box mb={2} display="flex" gap={2}>
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    label="Add New Content"
+                    value={newContent}
+                    onChange={(e) => setNewContent(e.target.value)}
+                  />
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleAddContent}
+                  >
+                    Add
+                  </Button>
+                </Box>
+
+                {content.map((item, index) => (
+                  <Accordion
+                    key={item?._id || index}
+                    expanded={expandedIndex === index}
+                    onChange={() => handleAccordionChange(index)}
+                  >
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Typography variant="subtitle1">{`${item.content} - ${
+                        item.joinedUser.length
+                      } ${
+                        item.joinedUser.length > 1 ? "users" : "user"
+                      } joined`}</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      {editingIndex === index ? (
+                        <Box>
+                          <TextField
+                            fullWidth
+                            variant="outlined"
+                            value={editingContent}
+                            onChange={(e) => setEditingContent(e.target.value)}
+                          />
+                          <Box mt={1} display="flex" gap={1}>
+                            <Button
+                              variant="contained"
+                              color="primary"
+                              onClick={() => handleUpdateContent(index)}
+                            >
+                              Save Changes
+                            </Button>
+                            <Button
+                              variant="contained"
+                              color="secondary"
+                              onClick={() => setEditingIndex(null)}
+                            >
+                              Cancel
+                            </Button>
+                          </Box>
+                        </Box>
+                      ) : (
+                        <Box>
+                          <Box mt={1} display="flex" gap={1}>
+                            <Button
+                              variant="outlined"
+                              color="primary"
+                              onClick={() => {
+                                setEditingIndex(index);
+                                setEditingContent(item.content);
+                              }}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              variant="outlined"
+                              color="error"
+                              onClick={() => handleDeleteContent(index)}
+                            >
+                              Delete
+                            </Button>
+                          </Box>
+                        </Box>
+                      )}
+                    </AccordionDetails>
+                  </Accordion>
+                ))}
+              </>
+            ) : (
+              <>
+                {content.map((item, index) => (
+                  <FormControlLabel
+                    key={item?._id || index}
+                    control={
+                      <Checkbox
+                        checked={selectedStatus[index] || false}
+                        onChange={() => handleCheckboxChange(index)}
+                      />
+                    }
+                    label={item.content}
+                    sx={{ display: "block", mb: 1 }}
+                  />
+                ))}
+                <Box mt={2}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleSubmit}
+                  >
+                    Submit Selection
+                  </Button>
+                </Box>
+              </>
+            )}
+          </Paper>
+          <InviteModal
+            open={open}
+            onCancel={() => setOpen(false)}
+            eventId={id || ""}
+          />
+        </Container>
+      )}
+    </>
   );
 };
 
