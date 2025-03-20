@@ -19,8 +19,15 @@ export interface Event {
 }
 
 export interface EventContent {
+  _id?: string;
   content: string;
-  joinedUser: string[];
+  joinedUser: joinedUser[];
+}
+
+interface joinedUser {
+  _id: string;
+  email?: string;
+  name?: string;
 }
 
 const initialState: userState = {
@@ -40,7 +47,6 @@ export const userSlice = createSlice({
       return action.payload;
     },
     getAllEvents: (state, action: PayloadAction<Event[]>) => {
-      console.log(action.payload);
       state.events = action.payload;
     },
     addEvent: (state, action: PayloadAction<Event>) => {

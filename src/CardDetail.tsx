@@ -45,10 +45,10 @@ const CardDetail: React.FC = () => {
 
   useEffect(() => {
     const fetchEvent = async (id: string) => {
-      const { events } = await getOneEvent(id);
-      setTitle(events.eventTitle);
-      setContent(events.eventContent);
-      setIsOwner(userId === events.owner);
+      const { event } = await getOneEvent(id);
+      setTitle(event.eventTitle);
+      setContent(event.eventContent);
+      setIsOwner(userId === event.owner);
     };
 
     if (id && userId !== "") {
@@ -59,8 +59,11 @@ const CardDetail: React.FC = () => {
   }, [id, userId, location, navigate]);
 
   useEffect(() => {
-    setSelectedStatus(Array(content.length).fill(false));
-  }, [content]);
+    const computedStatus = content.map(({ joinedUser }) =>
+      joinedUser.some((user) => user._id.toString() === userId)
+    );
+    setSelectedStatus(computedStatus);
+  }, [content, userId]);
 
   const handleAccordionChange = (index: number) => {
     setExpandedIndex(expandedIndex === index ? null : index);
@@ -112,15 +115,7 @@ const CardDetail: React.FC = () => {
   const handleSubmit = async () => {
     const selectedItems = content.filter((_, index) => selectedStatus[index]);
 
-    if (selectedItems.length === 0) {
-      alert("Please select at least one item.");
-      return;
-    }
-
-    console.log("Selected Items:", selectedItems);
-    alert("Your selection has been submitted!");
-    const data = await voteSelection(id || "", selectedItems);
-    console.log(data);
+    await voteSelection(id || "", selectedItems);
     handleBack();
   };
 
@@ -236,12 +231,16 @@ const CardDetail: React.FC = () => {
 
             {content.map((item, index) => (
               <Accordion
-                key={index}
+                key={item?._id || index}
                 expanded={expandedIndex === index}
                 onChange={() => handleAccordionChange(index)}
               >
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography variant="subtitle1">{item.content}</Typography>
+                  <Typography variant="subtitle1">{`${item.content} - ${
+                    item.joinedUser.length
+                  } ${
+                    item.joinedUser.length > 1 ? "users" : "user"
+                  } joined`}</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   {editingIndex === index ? (
@@ -300,10 +299,10 @@ const CardDetail: React.FC = () => {
           <>
             {content.map((item, index) => (
               <FormControlLabel
-                key={index}
+                key={item?._id || index}
                 control={
                   <Checkbox
-                    checked={selectedStatus[index]}
+                    checked={selectedStatus[index] || false}
                     onChange={() => {
                       handleCheckboxChange(index);
                     }}
@@ -318,7 +317,6 @@ const CardDetail: React.FC = () => {
                 variant="contained"
                 color="primary"
                 onClick={handleSubmit}
-                disabled={selectedStatus.every((status) => !status)}
               >
                 Submit Selection
               </Button>
