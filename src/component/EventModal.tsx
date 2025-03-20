@@ -11,7 +11,7 @@ import {
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import { useAppDispatch, useAppSelector } from "../hooks/reduxHooks";
-import { addEvent } from "../redux/reducer/user/userSlice";
+import { EventContent, addEvent } from "../redux/reducer/user/userSlice";
 import { createEvent } from "../utils/Request/userEvent";
 import { RootState } from "../redux/store/store";
 
@@ -22,27 +22,23 @@ type EventModalProp = {
 
 const EventModal: React.FC<EventModalProp> = ({ onOpen, onClose }) => {
   const [title, setTitle] = useState<string>("");
-  const [events, setEvents] = useState<string[]>([""]);
+  const [events, setEvents] = useState<EventContent[]>([]);
   const { id } = useAppSelector((state: RootState) => state.user);
   const dispatch = useAppDispatch();
 
   const handleCreateEvent = async () => {
-    const allEvents = await createEvent({
+    await createEvent({
       eventTitle: title,
       eventContent: events,
       owner: id,
     });
 
-    const eventLength = allEvents.data.holdEvents.length;
-    const eventId = allEvents.data.holdEvents[eventLength - 1];
-    dispatch(
-      addEvent({ _id: eventId, eventTitle: title, eventContent: events })
-    );
+    dispatch(addEvent({ eventTitle: title, eventContent: events, owner: id }));
     onClose();
   };
 
   const handleAddSchedule = () => {
-    setEvents([...events, ""]);
+    setEvents([...events, { content: "", joinedUser: [] }]);
   };
 
   const handleRemoveSchedule = (index: number) => {
@@ -53,7 +49,9 @@ const EventModal: React.FC<EventModalProp> = ({ onOpen, onClose }) => {
 
   const handleEventChange = (index: number, newEventText: string) => {
     const newEvents = events.map((item, i) =>
-      i === index ? newEventText : item
+      i === index
+        ? { content: newEventText, joinedUser: item.joinedUser }
+        : item
     );
     setEvents(newEvents);
   };
@@ -88,11 +86,16 @@ const EventModal: React.FC<EventModalProp> = ({ onOpen, onClose }) => {
 
         <Stack spacing={2}>
           {events.map((item, index) => (
-            <Stack key={index} direction="row" spacing={2} alignItems="center">
+            <Stack
+              key={item._id || index}
+              direction="row"
+              spacing={2}
+              alignItems="center"
+            >
               <TextField
                 label="Event"
                 type="text"
-                value={item} // Use the event string directly
+                value={item.content}
                 onChange={(e) => handleEventChange(index, e.target.value)}
                 fullWidth
               />

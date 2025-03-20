@@ -12,7 +12,7 @@ interface userState {
 }
 
 export interface Event {
-  _id: string;
+  _id?: string;
   eventTitle: string;
   eventContent: EventContent[];
   owner: string;

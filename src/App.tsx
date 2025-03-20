@@ -109,7 +109,7 @@ const App = () => {
               justifyContent="center"
             >
               <DashboardCard
-                id={event._id}
+                id={event?._id || ""}
                 title={event.eventTitle}
                 content={event.eventContent}
               />

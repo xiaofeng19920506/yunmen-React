@@ -12,11 +12,7 @@ interface DashboardCardProps {
   content: EventContent[];
 }
 
-const DashboardCard: React.FC<DashboardCardProps> = ({
-  id,
-  title,
-  content = [],
-}) => {
+const DashboardCard: React.FC<DashboardCardProps> = ({ id, title }) => {
   const navigate = useNavigate();
 
   const handleCardClick = (): void => {
