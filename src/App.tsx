@@ -27,7 +27,7 @@ const App = () => {
   const dispatch = useAppDispatch();
   const { name, id, events } = useAppSelector((state: RootState) => state.user);
   const { open } = useAppSelector((state: RootState) => state.modal);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const handleSignInClick = useCallback(() => navigate("/signin"), [navigate]);
   const handleSignUpClick = useCallback(() => navigate("/signup"), [navigate]);
 
