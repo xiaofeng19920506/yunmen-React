@@ -22,7 +22,9 @@ type EventModalProp = {
 
 const EventModal: React.FC<EventModalProp> = ({ onOpen, onClose }) => {
   const [title, setTitle] = useState<string>("");
-  const [events, setEvents] = useState<EventContent[]>([]);
+  const [events, setEvents] = useState<EventContent[]>([
+    { content: "", joinedUser: [] },
+  ]);
   const { id } = useAppSelector((state: RootState) => state.user);
   const dispatch = useAppDispatch();
 
@@ -71,10 +73,12 @@ const EventModal: React.FC<EventModalProp> = ({ onOpen, onClose }) => {
           left: "50%",
           transform: "translate(-50%, -50%)",
           width: 350,
+          height: 300,
           bgcolor: "background.paper",
           boxShadow: 24,
           p: 4,
           borderRadius: 2,
+          overflowY: "scroll",
         }}
       >
         <Typography variant="h6" gutterBottom>

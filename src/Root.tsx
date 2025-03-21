@@ -18,7 +18,15 @@ function Root() {
     dispatch(updateMessage(""));
   };
   return (
-    <>
+    <div
+      style={{
+        position: "absolute",
+        top: "0",
+        left: "0",
+        width: "100%",
+        height: "100%",
+      }}
+    >
       <PopUpMessage message={popMessage} open={show} onClose={handleClose} />
       <Routes>
         <Route path="/" element={<App />} />
@@ -34,7 +42,7 @@ function Root() {
           }
         />
       </Routes>
-    </>
+    </div>
   );
 }
 
