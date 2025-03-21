@@ -2,8 +2,7 @@ import axios from "axios";
 import Cookie from "js-cookie";
 
 const axiosInstance = axios.create({
-  // baseURL: import.meta.env.VITE_API_BASE_URL,
-  baseURL: "http://localhost:3000/api",
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
