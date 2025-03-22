@@ -70,10 +70,11 @@ const App = () => {
   );
 
   const userName = (name: string) => {
-    if (!name.split(" ")[0][0]) {
-      return name;
+    const parts = name.split(" ");
+    if (!parts[1]?.[0]) {
+      return "Guest User";
     }
-    return "Guest User";
+    return name;
   };
 
   const renderUserSection = () => (
