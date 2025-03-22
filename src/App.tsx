@@ -70,7 +70,7 @@ const App = () => {
   );
 
   const userName = (name: string) => {
-    if (name.split(" ")[0][0]) {
+    if (!name.split(" ")[0][0]) {
       return name;
     }
     return "Guest User";
