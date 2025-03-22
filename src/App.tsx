@@ -69,6 +69,13 @@ const App = () => {
     </>
   );
 
+  const userName = (name: string) => {
+    if (name.split(" ")[0][0]) {
+      return name;
+    }
+    return "Guest User";
+  };
+
   const renderUserSection = () => (
     <>
       <Button variant="contained" onClick={handleLogOutClick}>
@@ -77,7 +84,7 @@ const App = () => {
       <Button variant="contained" onClick={openEventModal}>
         Add Event
       </Button>
-      <Avatar {...stringAvatar(name || "Guest User")} />
+      <Avatar {...stringAvatar(userName(name))} />
     </>
   );
 
